@@ -11,8 +11,13 @@ Route::group([
 ], function () {
     Route::put('{id}', [StrainController::class, 'update']);
     Route::post('', [StrainController::class, 'store']);
-    
-    
     Route::delete('{id}', [StrainController::class, 'destroy']);
-    
+});
+
+Route::group([
+    'middleware' => ['api'],
+    'prefix' => 'strain'
+], function () {
+    Route::get('', [StrainController::class, 'getStrains'])->withoutMiddleware('auth');
+    Route::get('{id}', [NewsController::class, 'getNewsById'])->withoutMiddleware('auth');
 });
