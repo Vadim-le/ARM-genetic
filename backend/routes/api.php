@@ -16,16 +16,7 @@ require_once __DIR__ . '/api/podcasts.php';
 require_once __DIR__ . '/api/projects.php';
 require_once __DIR__ . '/api/roles.php';
 require_once __DIR__ . '/api/users.php';
-require_once __DIR__ . '/api/files.php';
-
-Route::prefix('v1')->group(function () {
-    require_once __DIR__ . '/api/v1/blogs.php';
-});
-
-
-
-
-
+require_once __DIR__ . '/api/strain.php';
 
 
 //TODO: Что делаем с этим?

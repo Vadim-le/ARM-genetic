@@ -11,17 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('podcasts', function (Blueprint $table) {
+        Schema::create('strain', function (Blueprint $table) {
             $table->increments('id');
-            $table->text('title');
-            $table->jsonb('description');
-            $table->text('content');
-            $table->text('cover_uri');
-            $table->enum('status', ['moderating', 'published', 'archived', 'pending']);
-            $table->integer('views')->unsigned()->default(0);;
-            $table->integer('likes')->unsigned()->default(0);;
-            $table->integer('reposts')->unsigned()->default(0);;
-            // $table->timestamps();
+            $table->text('name');
+            $table->text('link');
+            $table->text('place_of_allocation');
+            $table->text('year_of_allocation');
+            $table->text('type_of_bacteria');
             $table->timestampsTz();
             $table->integer('author_id')->unsigned();
 
@@ -34,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('podcasts');
+        Schema::dropIfExists('strain');
     }
 };

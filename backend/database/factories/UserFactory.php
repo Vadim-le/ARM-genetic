@@ -31,7 +31,6 @@ class UserFactory extends Factory
         return $this->afterCreating(function (User $user) {
             $role = $this->faker->randomElement([
                 'moderator',
-                'organization',
                 'user',
                 'user',
                 'user',

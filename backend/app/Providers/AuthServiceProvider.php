@@ -28,6 +28,7 @@ class AuthServiceProvider extends ServiceProvider
         Project::class => ProjectPolicy::class,
         Event::class => EventPolicy::class,
         Organization::class => OrganizationPolicy::class,
+        Strain::class => StrainPolicy::class,
     ];
 
     public function boot()

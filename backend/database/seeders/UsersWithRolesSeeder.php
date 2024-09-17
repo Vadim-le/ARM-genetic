@@ -11,7 +11,7 @@ class UsersWithRolesSeeder extends Seeder
     public function run()
     {
         $roles = [
-            'su', 'admin', 'moderator', 'blogger', 'guest', 'organization', 'user', 'news_creator'
+            'su', 'admin', 'moderator', 'scientist', 'student', 'user', 'guest', 
         ];
 
         foreach ($roles as $role) {

@@ -280,7 +280,7 @@ class UserMetadataFactory extends Factory
             'user_id' => User::factory(),
             'first_name' => $this->faker->firstName,
             'last_name' => $this->faker->lastName,
-            'patronymic' => $this->faker->middleName,
+            'patronymic' => $this->faker->firstName,
             'nickname' => $this->getRandomNickname(),
             'profile_image_uri' => $this->generateImageURL(128, 128),
             'gender' => $this->faker->randomElement(['m', 'f']),
