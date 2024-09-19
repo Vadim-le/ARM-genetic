@@ -166,34 +166,4 @@ class StrainController extends Controller
         // Возвращаем успешный ответ
         return $this->successResponse($strains->items(), $paginationData, Response::HTTP_OK);
     }
-
-
-    public function findRepeats(Request $request)
-    {
-        $sequence = $request->input('sequence');
-        $minLength = $request->input('min_length', 23); // Минимальная длина повторяющейся последовательности
-
-        $repeats = $this->findRepeatingSequences($sequence, $minLength);
-
-        return response()->json($repeats);
-    }
-
-    private function findRepeatingSequences($sequence, $minLength)
-    {
-        $length = strlen($sequence);
-        $repeats = [];
-
-        for ($i = 0; $i < $length; $i++) {
-            for ($j = $i + $minLength; $j <= $length; $j++) {
-                $subSeq = substr($sequence, $i, $j - $i);
-                if (substr_count($sequence, $subSeq) > 1) {
-                    $repeats[$subSeq] = substr_count($sequence, $subSeq);
-                }
-            }
-        }
-
-        return $repeats;
-    }
-        
-
 }
