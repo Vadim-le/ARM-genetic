@@ -17,7 +17,8 @@ use Illuminate\Support\Facades\Storage;
 
 class ProteinController extends Controller
 {
-    //ПЕРЕВОД ДНК В БЕЛОК!!!    
+    //ПЕРЕВОД ДНК В БЕЛОК!!!  
+    //TODO Добавить проверку на существование уже белка он уникальный должен быть то есть такое имя должно быть 
     public function translate(Request $request)
     {
         //$request->validate([
