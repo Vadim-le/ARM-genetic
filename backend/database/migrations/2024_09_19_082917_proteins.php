@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('proteins', function (Blueprint $table) {
             $table->increments('id');
+            $table->text('name');
             $table->text('link');
             $table->timestampsTz();
             $table->integer('author_id')->unsigned();

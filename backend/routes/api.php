@@ -17,6 +17,7 @@ require_once __DIR__ . '/api/projects.php';
 require_once __DIR__ . '/api/roles.php';
 require_once __DIR__ . '/api/users.php';
 require_once __DIR__ . '/api/strain.php';
+require_once __DIR__ . '/api/protein.php';
 
 
 //TODO: Что делаем с этим?

@@ -22,6 +22,7 @@ class Protein extends Model
     ];
 
     protected $fillable = [
+        'name',
         'link',
         'author_id',
         'strain_id',
