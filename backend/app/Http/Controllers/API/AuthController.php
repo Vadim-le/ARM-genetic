@@ -70,7 +70,7 @@ class AuthController extends Controller
             ],
         ]);
 
-
+        Log:info($request);
         if ($validator->fails()) {
             return $this->errorResponse('Validation Error', $validator->errors(), 422);
         }

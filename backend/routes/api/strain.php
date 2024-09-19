@@ -19,5 +19,4 @@ Route::group([
     'prefix' => 'strain'
 ], function () {
     Route::get('', [StrainController::class, 'getStrains'])->withoutMiddleware('auth');
-    Route::get('{id}', [NewsController::class, 'getNewsById'])->withoutMiddleware('auth');
 });

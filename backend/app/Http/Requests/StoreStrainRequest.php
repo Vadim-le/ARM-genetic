@@ -15,7 +15,7 @@ class StoreStrainRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255|unique:strain,name',
-            'link' => 'required|string|max:255',
+            //'link' => 'required|string|max:255',
             'place_of_allocation' => 'required|string|max:255',
             'year_of_allocation' => 'required|digits:4',
             'type_of_bacteria' => 'required|string|max:255',

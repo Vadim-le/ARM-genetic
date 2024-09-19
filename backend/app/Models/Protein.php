@@ -4,16 +4,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class strain extends Model
+class Protein extends Model
 {
     use HasFactory;
 
-    protected $table = 'strain'; 
+    protected $table = 'proteins'; 
 
     protected $casts = [
-        'place_of_allocation' => 'string',
-        'year_of_allocation' => 'string',
-        'type_of_bacteria' => 'string',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
@@ -25,12 +22,9 @@ class strain extends Model
     ];
 
     protected $fillable = [
-        'name',
         'link',
-        'place_of_allocation',
-        'year_of_allocation',
-        'type_of_bacteria',
         'author_id',
+        'strain_id',
     ];
 
 
@@ -39,14 +33,10 @@ class strain extends Model
         return $this->belongsTo(User::class, 'author_id');
     }
     
-    public function repeatSequences()
+    public function strain()
     {
-        return $this->hasMany(RepeatSequence::class, 'strain_id');
+        return $this->belongsTo(Strain::class, 'strain_id');
     }
 
-    public function protein()
-    {
-        return $this->hasOne(Protein::class, 'strain_id');
-    }
 
 }

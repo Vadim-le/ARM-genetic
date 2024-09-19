@@ -8,6 +8,7 @@ Route::group([
     'middleware' => ['api'],
     'prefix' => 'auth'
 ], function () {
+    Log::info('tyt');
     Route::get('verify_email', [AuthController::class, 'verifyEmail'])->withoutMiddleware('auth');
     Route::get('change_password', [AuthController::class, 'changePassword'])->withoutMiddleware('auth');
     
