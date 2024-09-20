@@ -1,6 +1,6 @@
 <template>
     <v-app>
-      <v-main class="d-flex align-top justify-center" style="height: 100vh; background-color:#FDFFF5;">
+      <v-main class="d-flex align-top justify-center" style="height: 100vh; background-color:#FFFFFF;">
         <v-container>
           <v-row class="d-flex justify-center">
             <v-col cols="12" md="2" class="d-flex">
@@ -20,7 +20,8 @@
                   <v-form v-if="isLogin">
                     <template v-if="tab === 'option-1'">
                       <v-card-title class="mt-n4 ml-n4">Настройки</v-card-title>
-                      <div class="text-subtitle-1 text-medium-emphasis">Имя</div>
+                      <div class="text-subtitle-2">Сохранение данных аккаунта доступно только после внесения изменений.</div>
+                      <div class="text-subtitle-1 text-large-emphasis">Имя</div>
                       <v-text-field
                         v-model="name"
                         variant="outlined"
@@ -28,22 +29,40 @@
                         density="compact"
                         dense
                       ></v-text-field>
-                      <div class="text-subtitle-1 text-medium-emphasis">Фамилия</div>
+                      <div class="text-subtitle-1 text-large-emphasis">Фамилия</div>
                       <v-text-field
                         v-model="surname"
                         variant="outlined"
                         placeholder="Введите фамилию"
                         density="compact"
                       ></v-text-field>
-                      <div class="text-subtitle-1 text-medium-emphasis">Отчество</div>
+                      <div class="text-subtitle-1 text-large-emphasis">Отчество</div>
                       <v-text-field
                         v-model="patronymic"
                         variant="outlined"
                         placeholder="Введите отчество"
                         density="compact"
                       ></v-text-field>
-                      <div class="text-subtitle-1 text-medium-emphasis">Дата рождения</div>
-                      <div class="text-subtitle-1 text-medium-emphasis">Пол</div>
+                     <div class="text-subtitle-1 text-large-emphasis">Пол</div>
+                      <v-radio-group
+                        v-model="inline"
+                        inline
+                      >
+                        <v-radio
+                          label="Мужской"
+                          value="radio-1"
+                        ></v-radio>
+                        <v-radio
+                          label="Женский"
+                          value="radio-2"
+                        ></v-radio>
+                      </v-radio-group>
+                      <v-divider class="border-opacity-100"></v-divider>
+                      <v-card-title class="mt-n1 ml-n4">Почта</v-card-title>
+                      <v-divider class="border-opacity-100"></v-divider>
+                      <v-card-title class="mt-n1 ml-n4">Удалить аккаунт</v-card-title>
+                      <div class="text-subtitle-1 text-large-emphasis">Удаление аккаунта — это необратимое действие. Все ваши данные будут удалены навсегда.</div>
+                      <v-btn class="custom-button">Удалить аккаунт</v-btn>
                     </template>
                     <template v-if="tab === 'option-2'">
                       <v-card-title class="mt-n4 ml-n4">Пароль</v-card-title>
@@ -85,6 +104,10 @@
         email: '',
         password: '',
         accessPoint: '',
+        selectedDate: null, // Хранит выбранную дату
+        showDatePicker: false, // Управляет видимостью календаря
+        column: null,
+        inline: null,
         tab: 'option-1' // Значение по умолчанию для выбранной вкладки
       };
     }
@@ -93,14 +116,42 @@
 
 <style scoped>
 .custom-card {
-  background-color: #FDFFF5;
-  border-radius: 20px;
+  background-color: #FFFFFF;
+  border-radius: 30px;
   padding: 20px;
-  border: 1px solid #3284e0;
+  border: 2px solid #3284e0;  
 }
 
 .text-subtitle-1 {
   margin-top: -15px; /* Задает отступы со всех сторон */
+}
+
+.text-subtitle-2 {
+  margin-bottom: 20px;
+  margin-top: 1px;
+  color: #857f7f;
+  font-size: 20px;
+}
+
+.custom-button {
+  background-color: #d11d1ddc; /* Зеленый фон */
+  color: #FDFFF5; /* Белый текст */
+  border-radius: 20px; /* Закругленные углы */
+  padding: 5px 5px; /* Отступы */
+  font-size: 12px; /* Размер шрифта */
+  transition: background-color 0.3s; /* Плавный переход */
+  border: 2px solid #d11d1ddc;
+  width: auto; /* Ширина кнопки 100% от родительского контейнера */
+  max-width: 1000px; /* Максимальная ширина кнопки */
+  height: auto; /* Высота автоматически подстраивается под содержимое */
+}
+
+/* Медиа-запрос для изменения размера шрифта на меньших экранах */
+@media (max-width: 600px) {
+  .custom-button {
+    font-size: 12px; /* Уменьшаем размер шрифта на маленьких экранах */
+    padding: 8px 16px; /* Уменьшаем отступы */
+  }
 }
 
 
