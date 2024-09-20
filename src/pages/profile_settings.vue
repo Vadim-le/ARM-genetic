@@ -19,32 +19,34 @@
                 <v-card-text>
                   <v-form v-if="isLogin">
                     <template v-if="tab === 'option-1'">
-                      <v-card-title class="mt-n4 ml-n3">Настройки</v-card-title>
+                      <v-card-title class="mt-n4 ml-n4">Настройки</v-card-title>
+                      <div class="text-subtitle-1 text-medium-emphasis">Имя</div>
                       <v-text-field
                         v-model="name"
                         variant="outlined"
-                        placeholder="Введите почту"
+                        placeholder="Введите имя"
                         density="compact"
-                        label="Имя"
                         dense
                       ></v-text-field>
+                      <div class="text-subtitle-1 text-medium-emphasis">Фамилия</div>
                       <v-text-field
                         v-model="surname"
                         variant="outlined"
-                        placeholder="Введите почту"
+                        placeholder="Введите фамилию"
                         density="compact"
-                        label="Фамилия"
                       ></v-text-field>
+                      <div class="text-subtitle-1 text-medium-emphasis">Отчество</div>
                       <v-text-field
                         v-model="patronymic"
                         variant="outlined"
-                        placeholder="Введите почту"
+                        placeholder="Введите отчество"
                         density="compact"
-                        label="Отчество"
                       ></v-text-field>
+                      <div class="text-subtitle-1 text-medium-emphasis">Дата рождения</div>
+                      <div class="text-subtitle-1 text-medium-emphasis">Пол</div>
                     </template>
                     <template v-if="tab === 'option-2'">
-                      <v-card-title class="mt-n4 ml-n3">Пароль</v-card-title>
+                      <v-card-title class="mt-n4 ml-n4">Пароль</v-card-title>
                       <v-text-field
                         v-model="password"
                         variant="outlined"
@@ -96,5 +98,10 @@
   padding: 20px;
   border: 1px solid #3284e0;
 }
+
+.text-subtitle-1 {
+  margin-top: -15px; /* Задает отступы со всех сторон */
+}
+
 
 </style>
