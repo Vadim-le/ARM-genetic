@@ -50,7 +50,7 @@
             this.$router.push({ name: 'Login' });
         },
       register() {
-        alert('Переход к странице регистрации');
+        this.$router.push({ name: 'ProfileSettings' });
       },
     },
   };
