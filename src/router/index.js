@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Login from '@/pages/login.vue'; // Импортируйте ваш компонент входа
 import Start from '@/pages/start.vue'; // Импортируйте ваш компонент стартовой страницы
 import ProfileSettings from '@/pages/profile_settings.vue'; 
+import Stamms from '@/pages/stamms.vue'; 
 
 const routes = [
     {
@@ -18,6 +19,11 @@ const routes = [
         path: '/login',
         name: 'Login',
         component: Login // Указываем компонент для страницы входа
+    },
+    {
+        path: '/stamms',
+        name: 'Stamms',
+        component: Stamms // Указываем компонент для страницы входа
     },
     {
         path: '/profile_settings',
