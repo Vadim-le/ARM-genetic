@@ -9,7 +9,7 @@
               <v-card-text>
                 <v-form v-if="isLogin">
                   <v-text-field
-                    v-model="email"
+                    v-model="login_email"
                     variant="outlined"
                     placeholder="Введите почту"
                     clearable
@@ -17,6 +17,7 @@
                     prepend-inner-icon="mdi-account"
                   ></v-text-field>
                   <v-text-field
+                    v-model="login_password"
                     :append-inner-icon="visible ?  'mdi-eye' : 'mdi-eye-off'"
                     :type="visible ? 'text' : 'password'"
                     placeholder="Введите пароль"
@@ -85,20 +86,22 @@
 </template>
 
 <script>
+import { jwtDecode } from "jwt-decode";
 export default {
   data() {
     return {
       repeatvisible: false,
       visible: false,
       isLogin: true,
-      username: '',
-      password: '',
+      //Поля для авторизации уже зарегестрированного юзера
+      login_email: '',
+      login_password: '',
+      
       newName: '',
       newSurname: '',
       newEmail: '',
-      email: '',
+      
       newPassword: '',
-      show1: false, // Переменная для показа/скрытия пароля
       rules: {
         required: value => !!value || 'Required.',
         min: v => v.length >= 8 || 'Min 8 characters',
@@ -112,30 +115,46 @@ export default {
     togglePasswordVisibility() {
       this.show1 = !this.show1; // Переключаем видимость пароля
     },
+    
     async login() {
-      try {
-        const response = await fetch('http://localhost:8000/api/auth/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            username: this.username,
-            password: this.password,
-          }),
-        });
+    try {
+      const loginData = {
+        email: this.login_email,
+        password: this.login_password,
+      };
 
-        if (!response.ok) {
-          throw new Error('Login failed');
-        }
+      const response = await fetch('http://localhost:8000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(loginData),
+      });
 
-        const data = await response.json();
-        console.log('Login successful:', data);
-        // Здесь вы можете сохранить токен или выполнить другие действия
-      } catch (error) {
-        console.error('Error during login:', error);
+      if (!response.ok) {
+        throw new Error('Login failed');
       }
-    },
+
+      const data = await response.json();
+
+      // Декодируем токен
+      const decodedToken = jwtDecode(data.access_token);
+      console.log('Decoded token:', decodedToken);
+
+      // Извлекаем роль
+      const userRoles = decodedToken.roles; // Предполагается, что роли находятся в поле "roles"
+      console.log('User roles:', userRoles);
+
+      // Сохраните токен и роли в состоянии приложения
+      localStorage.setItem('token', data.access_token);
+      this.$store.commit('setUserRole', userRoles);
+
+      this.$router.push({ name: 'Main' });
+
+    } catch (error) {
+      console.error('Error during login:', error);
+    }
+  },
     async register() {
       try {
         const response = await fetch('http://localhost:8000/api/auth/register', { // Обновленный путь

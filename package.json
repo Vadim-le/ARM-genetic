@@ -10,9 +10,12 @@
   "dependencies": {
     "@mdi/font": "7.4.47",
     "core-js": "^3.37.1",
+    "jwt-decode": "^4.0.0",
     "roboto-fontface": "*",
     "vue": "^3.4.31",
-    "vuetify": "^3.6.11"
+    "vue-jwt-decode": "^0.1.0",
+    "vuetify": "^3.7.2",
+    "vuex": "^4.0.2"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.5",
@@ -23,7 +26,8 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.4.0",
     "eslint-plugin-vue": "^9.27.0",
-    "sass": "1.77.6",
+    "sass": "^1.79.3",
+    "sass-loader": "^16.0.2",
     "unplugin-fonts": "^1.1.1",
     "unplugin-vue-components": "^0.27.2",
     "unplugin-vue-router": "^0.10.0",

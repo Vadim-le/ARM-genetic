@@ -1,12 +1,6 @@
 <template>
     <v-responsive class="border rounded">
-        <v-app>
-            <v-app-bar app >
-                <v-toolbar-title>Название вашего приложения</v-toolbar-title>
-                <v-spacer></v-spacer>
-                <v-btn text @click="goToHome">Главная</v-btn>
-                <v-btn text @click="goToAbout">О нас</v-btn>
-            </v-app-bar>        
+        <v-app>     
             <v-navigation-drawer app permanent>
                 <v-list density="default" >
                     <v-list-item title="Штаммы"></v-list-item> 
@@ -16,7 +10,7 @@
                 </v-list>
             </v-navigation-drawer>
             <v-main class="flex-grow-1">
-            <v-container fluid class="d-flex flex-column">  
+            <v-container fluid class="d-flex flex-column"style="max-width: 1600px; margin: auto;">  
                 <v-data-table
                     :headers="headers"
                     :items="items"

@@ -50,7 +50,7 @@
             this.$router.push({ name: 'Login' });
         },
       register() {
-        this.$router.push({ name: 'Stamms' });
+        this.$router.push({ name: 'Main' });
       },
     },
   };

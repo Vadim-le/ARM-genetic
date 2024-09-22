@@ -3,6 +3,7 @@ import Login from '@/pages/login.vue'; // Импортируйте ваш ком
 import Start from '@/pages/start.vue'; // Импортируйте ваш компонент стартовой страницы
 import ProfileSettings from '@/pages/profile_settings.vue'; 
 import Stamms from '@/pages/stamms.vue'; 
+import Main from '@/pages/main.vue';
 
 const routes = [
     {
@@ -21,9 +22,9 @@ const routes = [
         component: Login // Указываем компонент для страницы входа
     },
     {
-        path: '/stamms',
-        name: 'Stamms',
-        component: Stamms // Указываем компонент для страницы входа
+        path: '/main',
+        name: 'Main',
+        component: Main // Указываем компонент для страницы входа
     },
     {
         path: '/profile_settings',
