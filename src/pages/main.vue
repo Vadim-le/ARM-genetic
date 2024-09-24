@@ -2,13 +2,57 @@
   <v-app>
     <v-navigation-drawer v-model="drawer" app>
       <v-list v-if="isAdmin">
-        <v-list-item @click="toggleStammDetails">Хранилище данных</v-list-item>
-        <v-list v-show="showStammDetails">
-          <v-list-item @click="selectPage('storage_stamms')">Хранилище штаммов</v-list-item>
-          <v-list-item @click="selectPage('storage_proteins')">Хранилище белка</v-list-item>
-        </v-list>
-        <v-list-item @click="toggleStammDetails">Инструменты анализа</v-list-item>
-      </v-list>
+    <v-list-item 
+      @click="toggleStammDetails" 
+      :class="{ 'selected-category': selectedCategory === 'storage_data' }">
+      Хранилище данных
+    </v-list-item>
+    <v-list v-show="showStammDetails" class="pl-4">
+      <v-list-item 
+        @click="selectPage('storage_stamms')" 
+        :class="{ 'selected-category': selectedCategory === 'storage_stamms' }">
+        Хранилище штаммов
+      </v-list-item>
+      <v-list-item 
+        @click="selectPage('storage_proteins')" 
+        :class="{ 'selected-category': selectedCategory === 'storage_proteins' }">
+        Хранилище белка
+      </v-list-item>
+    </v-list>
+    <v-list-item 
+      @click="toggleToolsDetails" 
+      :class="{ 'selected-category': selectedCategory === 'tools' }">
+      Инструменты анализа
+    </v-list-item>
+    <v-list v-show="showToolsDetails" class="pl-4">
+      <v-list-item 
+        @click="selectPage('tool_stamm')" 
+        :class="{ 'selected-category': selectedCategory === 'tool_stamm' }">
+        Трансляция белка
+      </v-list-item>
+      <v-list-item 
+        @click="selectPage('tool_hydrophobic')" 
+        :class="{ 'selected-category': selectedCategory === 'tool_hydrophobic' }">
+        Гидрофобный профиль
+      </v-list-item>
+      <v-list-item 
+        @click="selectPage('tool_mass')" 
+        :class="{ 'selected-category': selectedCategory === 'tool_mass' }">
+        Молекулярно-массовый анализ
+      </v-list-item>
+      <v-list-item 
+        @click="selectPage('tool_amino')" 
+        :class="{ 'selected-category': selectedCategory === 'tool_amino' }">
+        Анализ аминокислотного состава
+      </v-list-item>
+      <v-list-item 
+        @click="selectPage('tool_iso')" 
+        :class="{ 'selected-category': selectedCategory === 'tool_iso' }">
+        Определение изоэлектрической точки
+      </v-list-item>
+    </v-list>
+  </v-list>
+
 
       <v-list v-else>
         <v-list-item @click="selectPage('page1')"> 1</v-list-item>
@@ -34,17 +78,19 @@
         </template>
         <v-list>
           <v-list-item @click="goToProfile">Профиль</v-list-item>
+          <v-list-item @click="goToSettings">Настройки</v-list-item>
           <v-list-item @click="logout">Выйти</v-list-item>
         </v-list>
       </v-menu>
     </v-app-bar>
-
-    <v-main class="flex-grow-1">
-      <v-container fluid class="pa-0">
-        <component :is="currentPage"></component>
-      </v-container>
-    </v-main>
-  </v-app>
+      <v-main class="flex-grow-1">
+        <v-container fluid class="pa-0">
+          <transition name="fade" mode="out-in">
+            <component :is="currentPage"></component>
+          </transition>
+        </v-container>
+      </v-main>
+    </v-app>
 </template>
 
 <script>
@@ -59,6 +105,7 @@ export default {
       currentPage: 'Page1', // По умолчанию отображается Page1
       drawer: false, // Состояние для управления видимостью меню
       showStammDetails: false, // Состояние для управления видимостью деталей штаммов
+      showToolsDetails: false, // Состояние для управления видимостью деталей штаммов
     };
   },
   computed: {
@@ -70,7 +117,11 @@ export default {
   methods: {
     goToProfile() {
       // Логика для перехода к профилю пользователя
-      console.log("Переход к профилю");
+      this.$router.push({ name: 'Profile' });
+    },
+    goToSettings() {
+      // Логика для перехода к профилю пользователя
+      this.$router.push({ name: 'ProfileSettings' });
     },
     async logout() {
       console.log('Выход из аккаунта');
@@ -103,16 +154,26 @@ export default {
     toggleStammDetails() {
       this.showStammDetails = !this.showStammDetails; 
     },
-    selectPage(page) {
-      console.log('Текущая роль пользователя:', this.userRole); // Выводим роль в консоль
-      this.currentPage = page.charAt(0).toUpperCase() + page.slice(1); // Преобразуем в формат компонента
-      if (page === 'storage_stamms') {
-        this.currentPage = 'StorageStamms'; // Устанавливаем текущую страницу на компонент хранилища штаммов
-      } else if (page === 'storage_proteins') {
-        this.currentPage = 'StorageProteins'; // Устанавливаем текущую страницу на компонент хранилища белка
-      }
-      this.drawer = false; // Закрываем меню при выборе страницы
+    toggleToolsDetails() {
+      this.showToolsDetails = !this.showToolsDetails; 
     },
+    selectPage(page) {
+    console.log('Текущая роль пользователя:', this.userRole); // Выводим роль в консоль
+
+    // Объект для сопоставления страниц с компонентами
+    const pageMap = {
+      storage_stamms: 'StorageStamms',
+      storage_proteins: 'StorageProteins'
+    };
+
+    // Устанавливаем текущую страницу на компонент из объекта, или на форматированное имя
+    this.currentPage = pageMap[page] || page.charAt(0).toUpperCase() + page.slice(1);
+    
+    // Устанавливаем выбранную категорию
+    this.selectedCategory = page;
+
+    this.drawer = false; // Закрываем меню при выборе страницы
+  },
     toggleDrawer() {
       this.drawer = !this.drawer; // Переключаем состояние меню
     },
@@ -132,3 +193,16 @@ export default {
   },
 };
 </script>
+<style scoped>
+.selected-category {
+  background-color: green; /* Задаем зеленый фон для выделенной категории */
+  color: white; /* Задаем белый цвет текста для контраста */
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 2.5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active в <2.1.8 */ {
+  opacity: 0;
+}
+</style>

@@ -4,6 +4,7 @@ import Start from '@/pages/start.vue'; // Импортируйте ваш ком
 import ProfileSettings from '@/pages/profile_settings.vue'; 
 import Stamms from '@/pages/stamms.vue'; 
 import Main from '@/pages/main.vue';
+import Profile from '@/pages/profile.vue';
 
 const routes = [
     {
@@ -30,6 +31,11 @@ const routes = [
         path: '/profile_settings',
         name: 'ProfileSettings',
         component: ProfileSettings // Указываем компонент для страницы входа
+    },
+    {
+        path: '/profile',
+        name: 'Profile',
+        component: Profile // Указываем компонент для страницы входа
     },
     // Другие маршруты
 ];
