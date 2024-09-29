@@ -478,15 +478,21 @@ class AuthController extends Controller
      */
     public function getProfile()
     {
-
         $user = Auth::user();
-        if (!$user)
+        if (!$user) {
             return $this->errorResponse('Неверные данные', [], 400);
-        $metadata = $user->metadata;
-
-        return $this->successResponse($metadata, 'Profile retrieved successfully.');
-
+        }
+    
+        // Загружаем только метаданные и данные об образовании
+        $metadata = $user->load(['metadata', 'education']);
+    
+        // Возвращаем только нужные данные
+        return $this->successResponse([
+            'metadata' => $metadata->metadata,
+            'education' => $metadata->education,
+        ], 'Profile retrieved successfully.');
     }
+    
 
 
     public function changeEmail(Request $request)

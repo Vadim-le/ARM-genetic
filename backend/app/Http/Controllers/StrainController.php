@@ -139,7 +139,8 @@ class StrainController extends Controller
         }
 
         // Получаем результаты с пагинацией
-        $perPage = $request->get('per_page', 10); // Значение по умолчанию 10
+        $perPage = $request->get('per_page'); // Значение по умолчанию 10
+        //$perPage = $request->get('per_page'); // когда пагинацию на клиенет сделаю тогда здесь уже параметр по умолчанию выставить
         $strains = $query->paginate($perPage);
 
         // Проверяем, есть ли записи

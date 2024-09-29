@@ -10,20 +10,32 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('user_login_data', function (Blueprint $table) {
-            $table->increments('id');
-            $table->text('password');
-            $table->text('email')->nullable()->unique();
-            $table->timestampTz('email_verified_at')->nullable();
-            $table->text('phone')->nullable()->unique();
-            $table->timestampTz('phone_verified_at')->nullable();
-            // $table->timestamp('phone_verified_at')->nullable();
-            $table->rememberToken();
-            // $table->timestamps();
-            $table->timestampsTz();
-            // $table->timestamp('blocked_at')->nullable();
-            $table->timestampTz('blocked_at')->nullable();
-        });
+            Schema::create('user_login_data', function (Blueprint $table) {
+                $table->increments('id');
+                $table->text('password');
+                $table->text('email')->nullable()->unique();
+                $table->timestampTz('email_verified_at')->nullable();
+                $table->text('phone')->nullable()->unique();
+                $table->timestampTz('phone_verified_at')->nullable();
+                $table->rememberToken();
+                $table->timestampsTz();
+                $table->timestampTz('blocked_at')->nullable();
+            });
+            
+            Schema::create('user_education_data', function (Blueprint $table) {
+                $table->increments('id');
+                $table->unsignedInteger('user_id'); // Поле для внешнего ключа
+                $table->text('educational_institute');
+                $table->text('educational_level');
+                $table->text('specialization');
+                $table->text('qualification');
+                $table->timestampTz('phone_verified_at')->nullable();
+                $table->integer('start_year')->unsigned()->check('start_year >= 1970 AND start_year <= 2024');
+                $table->integer('end_year')->unsigned()->check('end_year >= 1974 AND end_year <= 2024');
+                $table->timestampsTz();
+            
+                $table->foreign('user_id')->references('id')->on('user_login_data')->onDelete('cascade');
+            });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->unsignedInteger('user_id')->primary();
