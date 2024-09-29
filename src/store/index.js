@@ -3,6 +3,7 @@ import { createStore } from 'vuex';
 export default createStore({
   state: {
     userRole: null, // Изначально роль пользователя равна null
+    userId: null,
   },
   mutations: {
     setUserRole(state, role) {
@@ -10,6 +11,14 @@ export default createStore({
     },
     resetUserRole(state) {
       state.userRole = null; // Сброс роли пользователя
+    },
+
+    setUserId(state, id) {
+      state.userId = id; // Установка роли пользователя
+    },
+
+    resetUserId(state) {
+      state.userId = null; // Сброс роли пользователя
     },
   },
   actions: {
@@ -26,6 +35,10 @@ export default createStore({
     },
     isAdmin(state) {
       return state.userRole === 'admin'; // Проверка, является ли пользователь администратором
+    },
+
+    userId(state) {
+      return state.userId; // Геттер для получения роли пользователя
     },
   },
 });

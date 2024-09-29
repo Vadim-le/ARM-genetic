@@ -15,9 +15,12 @@
                     class="ma-2"
                   ></v-img>
                 </v-col>
-                <v-col class="d-flex align-start">
-                  <v-card-title class="ma-2">{{ cardTitle }}</v-card-title>
+                <v-col class="d-flex flex-column align-start"> <!-- Изменяем на flex-column для вертикального выравнивания -->
+                  <v-card-title class="ma-2">{{ user_metadata }}</v-card-title>
+                  <v-card-title class="ma-2">{{ user_age }}</v-card-title> <!-- Второй заголовок под первым -->
                 </v-col>
+              </v-row>
+              <v-row align="start">
               </v-row>
             </v-card>
             <v-card-actions>
@@ -82,15 +85,16 @@
                   <v-list-item-group>
                     <v-list-item v-for="(record, index) in records" :key="index">
                       <v-list-item-content>
-                        <v-list-item-subtitle>Учебное заведение: {{ record.institution }}</v-list-item-subtitle>
-                        <v-list-item-subtitle>Образование: {{ record.education }}</v-list-item-subtitle>
-                        <v-list-item-subtitle>Специальность: {{ record.specialty }}</v-list-item-subtitle>
+                        <v-list-item-subtitle>Учебное заведение: {{ record.educational_institute }}</v-list-item-subtitle>
+                        <v-list-item-subtitle>Образование: {{ record.educational_level }}</v-list-item-subtitle>
+                        <v-list-item-subtitle>Специальность: {{ record.specialization }}</v-list-item-subtitle>
                         <v-list-item-subtitle>Квалификация: {{ record.qualification }}</v-list-item-subtitle>
                         <v-list-item-subtitle>Годы обучения: {{ record.years }}</v-list-item-subtitle>
                         <v-divider></v-divider>
                       </v-list-item-content>
                     </v-list-item>
                   </v-list-item-group>
+
                 </v-list>
               </v-card>
             </v-col>
@@ -118,35 +122,66 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
+
 export default {
   data() {
     return {
       showFirstGroup: false,
       showSecondGroup: false,
-      cardTitle: 'Лебедев Вадим Антонович',
 
-      records: [
-        {
-          title: 'Третья карточка',
-          institution: 'Аспирантура ИГИУВ',
-          education: 'Высшее',
-          specialty: 'Анестезиология и реаниматология',
-          qualification: 'Врач анестезиолог-реаниматолог',
-          years: 'с 2003 по 2006'
-        },
-        {
-          title: 'Третья карточка',
-          institution: 'Аспирантура ИГИУВ',
-          education: 'Высшее',
-          specialty: 'Анестезиология и реаниматология',
-          qualification: 'Врач анестезиолог-реаниматолог',
-          years: 'с 2003 по 2006'
-        },
-        // Здесь можно добавить больше записей, если они есть
-      ]
-    };
+      user_metadata: '',
+      user_age: '',
+      academicDegree: '',
+      academicTitle: '',
+      // TODO: изменить после связки с сервером
+      records: []
+    }
+
   },
-  methods: {
+  async mounted() {
+  const token = localStorage.getItem('token'); // Получаем токен из localStorage
+  await this.fetchData(token); // Вызываем метод fetchData с токеном
+},
+methods: {
+  async fetchData(token) {
+  console.log('Запрос данных с токеном:', token);
+  try {
+    const response = await fetch(`http://localhost:8000/api/auth`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`, // Добавляем токен в заголовок
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error('Ошибка сети: ' + response.statusText);
+    }
+
+    const result = await response.json(); // Получаем ответ от сервера
+    console.log('Данные профиля пользователя:', result);
+
+    // Теперь обращаемся к полям внутри result.data
+    const data = result.data; // Извлекаем объект data
+
+    // Заполняем поля метаданных
+    this.user_metadata = ` ${data.metadata.last_name}  ${data.metadata.first_name} ${data.metadata.patronymic}`;
+    
+    // Заполняем массив записей об образовании
+    this.records = data.education.map(education => ({
+      educational_institute: education.educational_institute || '',
+      educational_level: education.educational_level || '',
+      specialization: education.specialization || '',
+      qualification: education.qualification || '',
+      years: `${education.start_year} - ${education.end_year}` // Форматируем годы
+    }));
+
+    console.log('Полученные данные:', data);
+  } catch (error) {
+    console.error('Ошибка при получении данных:', error);
+  }
+},
+
     showFirstSet() {
       this.showFirstGroup = true;
       this.showSecondGroup = false;

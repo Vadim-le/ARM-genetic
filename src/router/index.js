@@ -5,7 +5,6 @@ import ProfileSettings from '@/pages/profile_settings.vue';
 import Stamms from '@/pages/stamms.vue'; 
 import Main from '@/pages/main.vue';
 import Profile from '@/pages/profile.vue';
-
 const routes = [
     {
         path: '/',

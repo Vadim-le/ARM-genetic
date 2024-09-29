@@ -150,10 +150,13 @@ export default {
         // Извлекаем роль
         const userRoles = decodedToken.roles; // Предполагается, что роли находятся в поле "roles"
         console.log('User roles:', userRoles);
+        const userId = decodedToken.sub;
+        console.log('User ID:', userId);
 
         // Сохраните токен и роли в состоянии приложения
         localStorage.setItem('token', data.access_token);
         this.$store.commit('setUserRole', userRoles);
+        this.$store.commit('setUserId', userId);
 
         this.$router.push({ name: 'Main' });
 
