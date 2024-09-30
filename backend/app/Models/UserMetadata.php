@@ -26,6 +26,9 @@ class UserMetadata extends Model
         'profile_image_uri',
         'city',
         'birthday',
+        'contact_email',
+        'academic_title',
+        'academic_degree',
     ];
 
     public function user()

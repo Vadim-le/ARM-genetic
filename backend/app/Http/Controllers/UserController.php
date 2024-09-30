@@ -317,8 +317,12 @@ class UserController extends Controller
     //TODO Изменить принцип валидации на валидацию через request
     public function updateProfile(Request $request)
     {
-
+        Log::info($request);
+        // Validate the basic profile data
         $validator = Validator::make($request->all(), [
+            'contact_email' => 'nullable|string|max:255',
+            'academic_title' => 'nullable|string|max:255',
+            'academic_degree' => 'nullable|string|max:255',
             'first_name' => 'nullable|string|max:255',
             'last_name' => 'nullable|string|max:255',
             'patronymic' => 'nullable|string|max:255',
@@ -327,20 +331,28 @@ class UserController extends Controller
             'city' => 'nullable|string|max:255',
             'gender' => 'nullable|in:m,f',
             'birthday' => 'nullable|date',
+            'education' => 'nullable|array', // Validate education data as an array
+            'education.*.educational_institute' => 'required|string',
+            'education.*.educational_level' => 'required|string',
+            'education.*.specialization' => 'required|string',
+            'education.*.qualification' => 'required|string',
+            'education.*.start_year' => 'nullable|integer|between:1970,2024',
+            'education.*.end_year' => 'nullable|integer|between:1974,2024',
+            'education.*.id' => 'required|integer',
+            'bibliography' => 'nullable|array', // Validate bibliography data as an array
+            'bibliography.*.id' => 'required|integer',
+            'bibliography.*.journal_title' => 'required|string',
+            'bibliography.*.journal_link' => 'required|string',
         ]);
-
+    
         if ($validator->fails()) {
             return $this->errorResponse('Validation Error', $validator->errors(), 422);
         }
-
+    
         $user = Auth::user();
-        $metadata = $user->metadata;
-        if (!$metadata) {
-            $metadata = new UserMetadata();
-            $metadata->user_id = $user->id;
-        }
-
+        $metadata = $user->metadata ?? new UserMetadata();
         $metadata->fill($request->only([
+            'contact_email',
             'first_name',
             'last_name',
             'patronymic',
@@ -348,14 +360,37 @@ class UserController extends Controller
             'profile_image_uri',
             'city',
             'gender',
-            'birthday'
+            'birthday',
+            'academic_title',
+            'academic_degree',
+            
         ]));
-
+        Log::info('tyt seichas');
+        $metadata->user_id = $user->id; // Ensure user_id is set
         $metadata->save();
+    
+        // Update or create education records
+        if ($request->has('education')) {
+            foreach ($request->education as $eduData) {
+                $educationRecord = $user->education()->updateOrCreate(
+                    ['id' => $eduData['id']],
+                    $eduData
+                );
+            }
+        }
 
+        if ($request->has('bibliografia')) {
+            foreach ($request->bibliografia as $bibData) {
+                $bibliographyRecord = $user->bibliografia()->updateOrCreate(
+                    ['id' => $bibData['id']],
+                    $bibData
+                );
+            }
+        }
+       
         return $this->successResponse($metadata, 'Profile updated successfully.');
-
     }
+
 
 
     

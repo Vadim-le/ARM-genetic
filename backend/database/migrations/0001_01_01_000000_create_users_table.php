@@ -14,7 +14,6 @@ return new class extends Migration {
                 $table->increments('id');
                 $table->text('password');
                 $table->text('email')->nullable()->unique();
-                $table->text('contact_email')->nullable()->unique();
                 $table->timestampTz('email_verified_at')->nullable();
                 $table->text('phone')->nullable()->unique();
                 $table->timestampTz('phone_verified_at')->nullable();
@@ -91,6 +90,8 @@ return new class extends Migration {
             $table->date('birthday')->nullable();
             $table->text('academic_degree')->nullable();
             $table->text('academic_title')->nullable();
+            $table->text('contact_email')->nullable();
+
 
             $table->foreign('user_id')
                 ->references('id')
