@@ -484,12 +484,13 @@ class AuthController extends Controller
         }
     
         // Загружаем только метаданные и данные об образовании
-        $metadata = $user->load(['metadata', 'education']);
+        $metadata = $user->load(['metadata', 'education', 'bibliografia']);
     
         // Возвращаем только нужные данные
         return $this->successResponse([
             'metadata' => $metadata->metadata,
             'education' => $metadata->education,
+            'bibliografia' => $metadata->bibliografia,
         ], 'Profile retrieved successfully.');
     }
     
