@@ -3,8 +3,12 @@
       <v-main class="d-flex align-top justify-center" style="height: 100vh; background-color:#3284e0;">
         <v-container>
           <v-row class="d-flex justify-center">
+            <v-btn icon @click="goBack" class="mt-3">
+                  <v-icon>mdi-arrow-left</v-icon>
+                </v-btn>
             <v-col cols="12" md="2" class="d-flex">
               <v-card class="custom-card d-flex flex-column" style="flex: 1;">
+                
                 <v-card-title>Аккаунт</v-card-title>
                 <v-card-text>
                   <v-tabs v-model="tab" color="primary" direction="vertical">
@@ -393,6 +397,10 @@
       await this.fetchData(token);
     },
     methods: {
+      goBack() {
+    this.$router.go(-1);
+  },
+    
       markAsChanged() {
       this.isChanged = true; // Устанавливаем флаг изменений
     },
