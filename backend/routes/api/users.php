@@ -21,6 +21,7 @@ Route::group([
     'middleware' => ['auth:api'],
     'prefix' => 'users'
 ], function () {
+    Log::info('dvdvd');
     Route::get('', [UserController::class, 'listUsers']);
     Route::put('{user_id}', [UserController::class, 'updateProfile']);
     Route::put('{user_id}/password', [AuthController::class, 'requestChangePassword']);
@@ -30,4 +31,6 @@ Route::group([
     Route::delete('{user_id}', [UserController::class, 'deleteUser']);
     Route::patch('{user_id}/block', [SUController::class, 'blockUser']);
     Route::patch('{user_id}/unblock', [SUController::class, 'unblockUser']);
+    Route::delete('/education/{education_id}', [UserController::class, 'destroyEducation']);
+    Route::delete('/contact/{contact_id}', [UserController::class, 'destroyContact']);
 });

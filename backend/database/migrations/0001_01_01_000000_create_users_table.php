@@ -25,12 +25,12 @@ return new class extends Migration {
             Schema::create('user_education_data', function (Blueprint $table) {
                 $table->increments('id');
                 $table->unsignedInteger('user_id'); // Поле для внешнего ключа
-                $table->text('educational_institute');
-                $table->text('educational_level');
-                $table->text('specialization');
-                $table->text('qualification');
-                $table->integer('start_year')->unsigned()->check('start_year >= 1970 AND start_year <= 2024');
-                $table->integer('end_year')->unsigned()->check('end_year >= 1974 AND end_year <= 2024');
+                $table->text('educational_institute')->nullable();
+                $table->text('educational_level')->nullable();
+                $table->text('specialization')->nullable();
+                $table->text('qualification')->nullable();
+                $table->integer('start_year')->unsigned()->check('start_year >= 1970 AND start_year <= 2024')->nullable();
+                $table->integer('end_year')->unsigned()->check('end_year >= 1974 AND end_year <= 2024')->nullable();
                 $table->timestampsTz();
             
                 $table->foreign('user_id')->references('id')->on('user_login_data')->onDelete('cascade');
@@ -39,8 +39,8 @@ return new class extends Migration {
             Schema::create('bibliografia', function (Blueprint $table) {
                 $table->id(); // Уникальный идентификатор
                 $table->unsignedInteger('user_id'); 
-                $table->string('journal_title'); // Название журнала
-                $table->string('journal_link'); // Ссылка на журнал
+                $table->string('journal_title')->nullable(); // Название журнала
+                $table->string('journal_link')->nullable(); // Ссылка на журнал
                 $table->timestamps(); // Поля created_at и updated_at
 
                 $table->foreign('user_id')->references('id')->on('user_login_data')->onDelete('cascade');

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\UserEducationData;
+use App\Models\UserBibliografia;
 use App\Models\UserMetadata;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreUserRequest;
@@ -338,9 +340,9 @@ class UserController extends Controller
             'education.*.qualification' => 'required|string',
             'education.*.start_year' => 'nullable|integer|between:1970,2024',
             'education.*.end_year' => 'nullable|integer|between:1974,2024',
-            'education.*.id' => 'required|integer',
+            'education.*.id' => 'nullable|integer',
             'bibliography' => 'nullable|array', // Validate bibliography data as an array
-            'bibliography.*.id' => 'required|integer',
+            'bibliography.*.id' => 'nullable|integer',
             'bibliography.*.journal_title' => 'required|string',
             'bibliography.*.journal_link' => 'required|string',
         ]);
@@ -390,6 +392,42 @@ class UserController extends Controller
        
         return $this->successResponse($metadata, 'Profile updated successfully.');
     }
+
+
+public function destroyEducation($educationId)
+{
+    Log::info('DeleteEducation');
+    // Get the authenticated user
+    $user = Auth::user();
+
+    // Find the education record by ID and delete it
+    $education = UserEducationData::where('id', $educationId)->where('user_id', $user->id)->first();
+
+    if ($education) {
+        $education->delete();
+        return response()->json(['message' => 'Запись об образовании успешно удалена'], 200);
+    }
+
+    return response()->json(['message' => 'Запись не найдена'], 404);
+}
+
+public function destroyContact($contactId)
+{
+    // Get the authenticated user
+    $user = Auth::user();
+
+    // Find the education record by ID and delete it
+    $contact = UserBibliografia::where('id', $contactId)->where('user_id', $user->id)->first();
+
+    if ($contact) {
+        $contact->delete();
+        return response()->json(['message' => 'Запись об контактах успешно удалена'], 200);
+    }
+
+    return response()->json(['message' => 'Запись не найдена'], 404);
+}
+
+
 
 
 
