@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-main class="d-flex justify-center" style="height: 100vh; background-color:rgba(50, 132, 224, 0.6);">
+    <v-main class="d-flex justify-center" style="">
       <v-container>
         <v-row class="d-flex flex-wrap justify-center">
           <v-col sm="12" md="8" class="ma-2"> <!-- Верхняя карточка -->
@@ -61,20 +61,25 @@
                     <span>{{ academicTitle }}</span>
                   </v-col>
                 </v-row>
-                <v-card-title>Первая карточка</v-card-title>
               </v-card>
             </v-col>
 
             <v-col sm="6" md="4"> 
               <v-card class="custom-card">
-                <v-img
-                  src="@/images/login.png" 
-                  height="200" 
-                  width="200" 
-                  contain
-                  class="mb-2"
-                ></v-img>
-                <v-card-title>Вторая карточка</v-card-title>
+                <v-card-title>Ссылки на журналы</v-card-title>
+                <v-divider></v-divider>
+                <v-list>
+                  <v-list-item-group>
+                    <v-list-item v-for="(record, index) in bibliografia_records" :key="index">
+                      <v-list-item-content>
+                        <v-list-item-subtitle>Название журнала: {{ record.journal_title }}</v-list-item-subtitle>
+                        <v-list-item-subtitle>Ссылка на журнал: <a :href="record.journal_link" target="_blank">{{ record.journal_link }}</a></v-list-item-subtitle>
+                        <v-divider></v-divider>
+                      </v-list-item-content>
+                    </v-list-item>
+                  </v-list-item-group>
+
+                </v-list>
               </v-card>
             </v-col>
             <v-col sm="12" md="8"> 
@@ -83,7 +88,7 @@
                 <v-divider></v-divider>
                 <v-list>
                   <v-list-item-group>
-                    <v-list-item v-for="(record, index) in records" :key="index">
+                    <v-list-item v-for="(record, index) in education_records" :key="index">
                       <v-list-item-content>
                         <v-list-item-subtitle>Учебное заведение: {{ record.educational_institute }}</v-list-item-subtitle>
                         <v-list-item-subtitle>Образование: {{ record.educational_level }}</v-list-item-subtitle>
@@ -122,8 +127,6 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-
 export default {
   data() {
     return {
@@ -135,7 +138,8 @@ export default {
       academicDegree: '',
       academicTitle: '',
       // TODO: изменить после связки с сервером
-      records: []
+      education_records: [],
+      bibliografia_records: [],
     }
 
   },
@@ -144,6 +148,19 @@ export default {
   await this.fetchData(token); // Вызываем метод fetchData с токеном
 },
 methods: {
+  calculateAge(birthday) {
+    const birthDate = new Date(birthday);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+
+    // Проверяем, был ли день рождения в этом году
+    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+
+    return age;
+},
   async fetchData(token) {
   console.log('Запрос данных с токеном:', token);
   try {
@@ -166,9 +183,12 @@ methods: {
 
     // Заполняем поля метаданных
     this.user_metadata = ` ${data.metadata.last_name}  ${data.metadata.first_name} ${data.metadata.patronymic}`;
+    this.user_age = this.calculateAge(data.metadata.birthday);
+    this.academicDegree = data.metadata.academic_degree;
+    this.academicTitle = data.metadata.academic_title;
     
     // Заполняем массив записей об образовании
-    this.records = data.education.map(education => ({
+    this.education_records = data.education.map(education => ({
       educational_institute: education.educational_institute || '',
       educational_level: education.educational_level || '',
       specialization: education.specialization || '',
@@ -176,11 +196,18 @@ methods: {
       years: `${education.start_year} - ${education.end_year}` // Форматируем годы
     }));
 
+    this.bibliografia_records = data.bibliografia.map(bibliografia => ({
+      journal_title: bibliografia.journal_title || '',
+      journal_link: bibliografia.journal_link || '', // Исправлено здесь
+    }));
+
     console.log('Полученные данные:', data);
   } catch (error) {
     console.error('Ошибка при получении данных:', error);
   }
 },
+// Функция для вычисления возраста
+
 
     showFirstSet() {
       this.showFirstGroup = true;
