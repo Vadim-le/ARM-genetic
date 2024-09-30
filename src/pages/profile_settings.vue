@@ -489,6 +489,7 @@ async saveData() {
     const result = await response.json();
     console.log('Данные успешно сохранены:', result);
     this.isChanged = false; // Сбрасываем флаг изменений после успешного сохранения
+    await this.fetchData(token);
   } catch (error) {
     console.error('Ошибка при сохранении данных:', error);
   }
@@ -516,12 +517,58 @@ async saveData() {
         id: '',
       });
     },
-    removeEducationRecord(index) {
-      this.educationRecords.splice(index, 1);
-    },
-    removeContactRecord(index) {
-      this.contactRecords.splice(index, 1);
-    },
+
+    async removeEducationRecord(index) {
+  const recordId = this.educationRecords[index].id; // Get the ID of the record to be deleted
+  const token = localStorage.getItem('token');
+
+  try {
+    // Make a DELETE request to the backend
+    const response = await fetch(`http://localhost:8000/api/users/education/${recordId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Ошибка при удалении записи об образовании');
+    }
+
+    // If successful, remove the record from the local state
+    this.educationRecords.splice(index, 1);
+    console.log('Запись об образовании успешно удалена');
+  } catch (error) {
+    console.error('Ошибка при удалении записи об образовании:', error);
+  }
+},
+
+    async removeContactRecord(index) {
+  const recordId = this.contactRecords[index].id; // Get the ID of the record to be deleted
+  const token = localStorage.getItem('token');
+
+  try {
+    // Make a DELETE request to the backend
+    const response = await fetch(`http://localhost:8000/api/users/contact/${recordId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Ошибка при удалении записи об образовании');
+    }
+
+    // If successful, remove the record from the local state
+    this.contactRecords.splice(index, 1);
+    console.log('Запись об образовании успешно удалена');
+  } catch (error) {
+    console.error('Ошибка при удалении записи об образовании:', error);
+  }
+},
     openDialogEducation(index) {
       this.selectedRecord = this.educationRecords[index];
       this.dialog = true; // Открываем диалог
