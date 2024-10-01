@@ -5,6 +5,7 @@ import ProfileSettings from '@/pages/profile_settings.vue';
 import Stamms from '@/pages/stamms.vue'; 
 import Main from '@/pages/main.vue';
 import Profile from '@/pages/profile.vue';
+import SequenceManagement from '@/pages/sequence_management.vue';
 const routes = [
     {
         path: '/',
@@ -35,6 +36,11 @@ const routes = [
         path: '/profile',
         name: 'Profile',
         component: Profile // Указываем компонент для страницы входа
+    },
+    {
+        path: '/sequence_management/:id',
+        name: 'SequenceManagement',
+        component: SequenceManagement // Указываем компонент для страницы входа
     },
     // Другие маршруты
 ];
