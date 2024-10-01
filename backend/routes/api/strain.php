@@ -18,5 +18,6 @@ Route::group([
     'middleware' => ['api'],
     'prefix' => 'strain'
 ], function () {
+    Log::info('получить последовательность!');
     Route::get('', [StrainController::class, 'getStrains'])->withoutMiddleware('auth');
 });

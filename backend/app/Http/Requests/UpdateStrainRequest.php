@@ -13,7 +13,7 @@ class UpdateStrainRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|max:255|unique:strain,name',
+            'name' => 'required|string|max:255',
             'link' => 'required|string|max:255',
             'place_of_allocation' => 'required|string|max:255',
             'year_of_allocation' => 'required|digits:4',

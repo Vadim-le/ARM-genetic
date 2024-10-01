@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('strain', function (Blueprint $table) {
             $table->increments('id');
-            $table->text('name');
+            $table->text('name')->unique();
             $table->text('link');
             $table->text('place_of_allocation');
             $table->text('year_of_allocation');

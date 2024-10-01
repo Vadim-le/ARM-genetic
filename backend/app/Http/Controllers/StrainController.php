@@ -50,8 +50,8 @@ class StrainController extends Controller
             $path = Storage::disk('public')->put('uploads/' . $newFileName, $filteredContent);
 
             // Получаем полный URL к файлу
-            $url = Storage::url('uploads/' . $newFileName);
-
+            $url = Storage::url('app/public/uploads/' . $newFileName);
+            Log::info($url);
             // Создаем запись в базе данных
             $strain = Strain::create($request->validated() + [
                 'author_id' => Auth::id(),
@@ -68,22 +68,53 @@ class StrainController extends Controller
     public function update(UpdateStrainRequest $request, int $id)
     {
         Log::info('Update');
-        
+        Log::info($request);
+    
+        // Валидация входных данных
+        $validatedData = $request->validate([
+            'name' => 'required|string', // Поле для имени штамма
+            'link' => 'required|string', // Поле для содержимого файла
+            'place_of_allocation' => 'required|string',
+            'year_of_allocation' => 'nullable|integer|between:1970,2024',
+            'type_of_bacteria' => 'required|string',
+            'file_content' => 'required|string',
+        ]);
+    
         $strain = Strain::find($id);
         if (!$strain) {
             return $this->errorResponse('Запись не найдена', [], Response::HTTP_NOT_FOUND);
         }
-
+    
         if (!Auth::user()->can('update', $strain)) {
             return $this->errorResponse('Отсутствуют разрешения', [], 403);
         }
-
-        $validatedData = $request->validated();
-
+    
+        // Обновляем запись в базе данных
         $strain->update($validatedData);
+        Log::info($validatedData);
+    
+        // Обновляем содержимое файла
+        if (isset($validatedData['file_content'])) {
+            $filePath = 'C:/ARM-genetic/backend' . $strain->link; // Используем полный путь
+            Log::info($filePath);
+            if ($filePath) {
+                try {
+                    file_put_contents($filePath, $validatedData['file_content']);
+                    Log::info("Файл успешно обновлен.");
+                } catch (\Exception $e) {
+                    Log::error("Ошибка при обновлении файла: " . $e->getMessage());
+                    return $this->errorResponse('Ошибка при обновлении файла: ' . $e->getMessage(), [], 500);
+                }
+            } else {
+                Log::error("Путь к файлу не найден.");
+                return $this->errorResponse('Путь к файлу не найден.', [], 500);
+            }
+        }
         
         return $this->successResponse(['strain' => $strain], 'Запись о штамме успешно обновлена', 200);
     }
+    
+    
 
     public function destroy(int $id): \Illuminate\Http\JsonResponse
     {
@@ -153,10 +184,12 @@ class StrainController extends Controller
             foreach ($strains as $strain) {
                 if ($strain->link) {
                     // Извлекаем относительный путь из URL
-                    $relativePath = str_replace('/storage/', '', $strain->link); // Убираем /storage/
+                    //$relativePath = str_replace('/storage/', '', $strain->link); // Убираем /storage/
+                    $filePath = 'C:/ARM-genetic/backend' . $strain->link;
                     
                     // Получаем содержимое файла из хранилища
-                    $strain->file_content = Storage::disk('public')->get($relativePath);
+                    //$strain->file_content = Storage::disk('public')->get($relativePath);
+                    $strain->file_content = file_get_contents($filePath);
                 }
             }
         }
