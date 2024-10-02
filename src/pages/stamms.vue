@@ -1,14 +1,7 @@
 <template>
   <v-responsive class="border rounded">
     <v-app>
-      <v-navigation-drawer app permanent>
-        <v-list density="default">
-          <v-list-item title="Штаммы"></v-list-item> 
-          <v-divider></v-divider>
-          <v-list-item link @click="updateItems('Стафилококк')" title="Стафилококк" value="stafilococus"></v-list-item>
-          <v-list-item link @click="updateItems('Чума')" title="Чума" value="chuma"></v-list-item>
-        </v-list>
-      </v-navigation-drawer>
+
       <v-main class="flex-grow-1">
         <v-container fluid class="d-flex flex-column" style="max-width: 1600px; margin: auto;">  
           <v-btn color="primary" class="mt-4" @click="showForm = true">Добавить</v-btn>
@@ -121,7 +114,8 @@ export default {
       console.log('Выбранный элемент:', selectedItem);
       await this.fetchData(selectedItem);
     },
-    async fetchData(selectedItem) {
+    async fetchData() {
+      const selectedItem = 'Стафилококк';
       console.log('Запрос данных для элемента:', selectedItem);
       try {
         const response = await fetch(`http://localhost:8000/api/strain?type_of_bacteria=${selectedItem}`, {
