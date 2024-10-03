@@ -35,6 +35,7 @@ return new class extends Migration
             $table->json('spacer_positions'); // Используем JSON для хранения массивов
             $table->boolean('is_known')->default(false);
             $table->string('status')->default('pending'); // Поле для статуса анализа
+            $table->text('full_context');
 
             $table->foreign('author_id')->references('id')->on('user_login_data')->onDelete('cascade');
             $table->foreign('strain_id')->references('id')->on('strain')->onDelete('cascade');

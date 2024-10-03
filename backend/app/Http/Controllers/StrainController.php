@@ -267,7 +267,8 @@ class StrainController extends Controller
                 'spacer_sequence' => $repeatInfo['spacer'],
                 'spacer_positions' => json_encode($repeatInfo['spacer_positions']), // Преобразование в JSON
                 'is_known' => $repeatInfo['is_known'],
-                'status' => 'на рассмотрении'
+                'full_context' => $repeatInfo['full_context'], //
+                'status' => 'на рассмотрении',
             ]);
         }
 

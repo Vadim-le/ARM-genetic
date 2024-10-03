@@ -22,6 +22,7 @@ class AnalyzeStrain extends Model
         'spacer_positions',
         'is_known',
         'status',
+        'full_context',
     ];
 
     // Если вы хотите использовать другие типы данных для некоторых полей, укажите их в кастах
