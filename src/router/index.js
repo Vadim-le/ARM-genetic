@@ -6,6 +6,13 @@ import Stamms from '@/pages/stamms.vue';
 import Main from '@/pages/main.vue';
 import Profile from '@/pages/profile.vue';
 import SequenceManagement from '@/pages/sequence_management.vue';
+import ProteinAnalyze from '@/pages/protein_analyze.vue';
+import NucleotideAnalyze from '@/pages/nucleotide_analyze.vue';
+
+
+
+
+
 const routes = [
     {
         path: '/',
@@ -41,6 +48,16 @@ const routes = [
         path: '/sequence_management/:id',
         name: 'SequenceManagement',
         component: SequenceManagement // Указываем компонент для страницы входа
+    },
+    {
+        path: '/protein_analyze',
+        name: 'ProteinAnalyze',
+        component: ProteinAnalyze // Указываем компонент для страницы входа
+    },
+    {
+        path: '/nucleotide_analyze',
+        name: 'NucleotideAnalyze',
+        component: NucleotideAnalyze // Указываем компонент для страницы входа
     },
     // Другие маршруты
 ];

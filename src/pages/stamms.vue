@@ -5,7 +5,7 @@
       <v-main class="flex-grow-1">
         <v-container fluid class="d-flex flex-column" style="max-width: 1600px; margin: auto;">  
           <v-btn color="primary" class="mt-4" @click="showForm = true">Добавить</v-btn>
-          <v-dialog v-model="showForm" max-width="500">
+          <v-dialog v-model="showForm" max-width="800">
             <v-card>
               <v-form ref="form" @submit.prevent="saveStrainData"> 
                 <v-card-title class="text-h5">Добавить штамм</v-card-title>
@@ -109,11 +109,10 @@ export default {
       },
     }
   },
-  methods: {
-    async updateItems(selectedItem) {
-      console.log('Выбранный элемент:', selectedItem);
-      await this.fetchData(selectedItem);
+  async mounted() {
+        await this.fetchData();
     },
+  methods: {
     async fetchData() {
       const selectedItem = 'Стафилококк';
       console.log('Запрос данных для элемента:', selectedItem);

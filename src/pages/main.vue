@@ -22,23 +22,23 @@
     <v-list-item 
       @click="toggleToolsDetails" 
       :class="{ 'selected-category': selectedCategory === 'tools' }">
-      Инструменты анализа
+      Инструменты расчета
     </v-list-item>
     <v-list v-show="showToolsDetails" class="pl-4">
       <v-list-item 
-        @click="selectPage('tool_stamm')" 
-        :class="{ 'selected-category': selectedCategory === 'tool_stamm' }">
-        Трансляция белка
+        @click="selectPage('protein_analyze')" 
+        :class="{ 'selected-category': selectedCategory === 'protein_analyze' }">
+        Полный анализ белка
       </v-list-item>
       <v-list-item 
         @click="selectPage('tool_hydrophobic')" 
         :class="{ 'selected-category': selectedCategory === 'tool_hydrophobic' }">
-        Гидрофобный профиль
+        Поиск cas-генов
       </v-list-item>
       <v-list-item 
         @click="selectPage('tool_mass')" 
         :class="{ 'selected-category': selectedCategory === 'tool_mass' }">
-        Молекулярно-массовый анализ
+        Поиск повторяющихся последовательнстей
       </v-list-item>
       <v-list-item 
         @click="selectPage('tool_amino')" 
@@ -51,6 +51,19 @@
         Определение изоэлектрической точки
       </v-list-item>
     </v-list>
+      <v-list-item 
+      @click="toggleAnalyzeToolsDetails" 
+      :class="{ 'selected-category': selectedCategory === 'analyze_tools' }">
+      Инструменты анализа
+    </v-list-item>
+    <v-list v-show="toggleAnalyzeToolsDetails" class="pl-4">
+      <v-list-item 
+        @click="selectPage('nucleotide_analyze')" 
+        :class="{ 'selected-category': selectedCategory === 'nucleotide_analyze' }">
+        Анализ нуклеотидов
+      </v-list-item>
+    </v-list>
+    
   </v-list>
 
 
@@ -97,7 +110,10 @@
 import Page1 from './stamms.vue';
 import StorageStamms from './stamms.vue'; // Импортируем компонент хранилища штаммов
 import StorageProteins from './profile_settings.vue'; // Импортируем компонент хранилища белка
+import ProteinAnalyze from './protein_analyze.vue';
+import NucleotideAnalyze from './nucleotide_analyze.vue';
 import { mapGetters } from 'vuex'; // Импортируем mapGetters для доступа к геттерам Vuex
+
 
 export default {
   data() {
@@ -106,6 +122,7 @@ export default {
       drawer: false, // Состояние для управления видимостью меню
       showStammDetails: false, // Состояние для управления видимостью деталей штаммов
       showToolsDetails: false, // Состояние для управления видимостью деталей штаммов
+      showAnalzeToolsDetails: false,
     };
   },
   computed: {
@@ -157,13 +174,18 @@ export default {
     toggleToolsDetails() {
       this.showToolsDetails = !this.showToolsDetails; 
     },
+    toggleAnalyzeToolsDetails() {
+      this.showAnalyzeToolsDetails = !this.showAnalyzeToolsDetails; 
+    },
     selectPage(page) {
     console.log('Текущая роль пользователя:', this.userRole); // Выводим роль в консоль
 
     // Объект для сопоставления страниц с компонентами
     const pageMap = {
       storage_stamms: 'StorageStamms',
-      storage_proteins: 'StorageProteins'
+      storage_proteins: 'StorageProteins',
+      protein_analyze: 'ProteinAnalyze',
+      nucleotide_analyze: 'NucleotideAnalyze'
     };
 
     // Устанавливаем текущую страницу на компонент из объекта, или на форматированное имя
@@ -182,6 +204,8 @@ export default {
     Page1,
     StorageStamms,
     StorageProteins,
+    ProteinAnalyze,
+    NucleotideAnalyze,
   },
   mounted() {
     // Устанавливаем текущую страницу в зависимости от роли пользователя
