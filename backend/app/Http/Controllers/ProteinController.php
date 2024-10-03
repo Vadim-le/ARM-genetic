@@ -2,67 +2,67 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\strain;
+use App\Models\Strain;
 use App\Models\Protein;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
-use App\Traits\PaginationTrait;
-use App\Traits\QueryBuilderTrait;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Storage;
-
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ProteinController extends Controller
 {
-    //ПЕРЕВОД ДНК В БЕЛОК!!!  
-    //TODO Добавить проверку на существование уже белка он уникальный должен быть то есть такое имя должно быть 
-    public function translate(Request $request)
+    public function analyze(Request $request)
     {
-        //$request->validate([
-        //    'strain_name' => 'required|string', // Поле для имени штамма
-        //]);
-
-        // Получаем штамм по имени
-        $strain = Strain::where('name', $request->input('name'))->first();
-        if (!$strain) {
-            return response()->json(['error' => 'Штамм не найден'], 404);
+        $mode = $request->input('mode');
+        $analyses = json_decode($request->input('analyses', '[]'), true); // Преобразуем JSON-строку в массив
+        $scales = json_decode($request->input('scales', '[]'), true); // Преобразуем JSON-строку в массив
+        $isotopes = $request->input('isotopes', []);
+        $pH = $request->input('pH');
+    
+        // Проверяем, был ли передан файл
+        if (!$request->hasFile('file')) {
+            return response()->json(['error' => 'Файл не передан'], 400);
         }
-
-        // Получаем последовательность ДНК из файла
-        // Извлекаем относительный путь из ссылки
-        $relativePath = str_replace('/storage/', '', $strain->link);
-
-        // Получаем содержимое файла из хранилища
-        $dnaSequence = Storage::disk('public')->get($relativePath);
-        Log::info('Полученная последовательность ДНК: ' . $dnaSequence);
-        $dnaSequence = strtoupper(trim($dnaSequence)); // Приводим к верхнему регистру и убираем пробелы
-        Log::info('Последовательность ДНК в верхнем регистре: ' . $dnaSequence);
-
-        // Переводим ДНК в белок
-        $proteinSequence = $this->dnaToProtein($dnaSequence);
-        Log::info('Последовательность ДНК в верхнем регистре: ' . $proteinSequence);
-
-         // Сохраняем последовательность белка в файл
-        $proteinFileName = $strain->name . '_protein.txt';
-        $proteinFilePath = Storage::disk('public')->put('uploads/proteins/' . $proteinFileName, $proteinSequence);
-
-        // Получаем полный URL к файлу
-        $proteinUrl = Storage::url('uploads/' . $proteinFileName);
-        $proteiname = ($strain->name);
-        // Сохраняем информацию о белке в таблице proteins
-        $protein = Protein::create([
-            'name' => $proteiname,
-            'link' => $proteinUrl,
-            'author_id' => auth()->id(), // Предполагается, что пользователь аутентифицирован
-            'strain_id' => $strain->id,
-        ]);
-
-        return response()->json([
-            'protein_sequence' => $proteinSequence,
-        ]);
+    
+        // Получаем файл из запроса
+        $file = $request->file('file');
+        $sequence = strtoupper(trim(file_get_contents($file->getRealPath())));
+    
+        $proteinSequence = '';
+    
+        if ($mode === 'DNA') {
+            // Переводим ДНК в белок
+            $proteinSequence = $this->dnaToProtein($sequence);
+        } elseif ($mode === 'Protein') {
+            // Используем последовательность белка напрямую
+            $proteinSequence = $sequence;
+        } else {
+            return response()->json(['error' => 'Неверный режим анализа'], 400);
+        }
+    
+        $results = [];
+    
+        // Выполняем анализы в зависимости от запроса
+        if (in_array('hydrophobicity', $analyses)) {
+            $results['hydrophobicity'] = $this->analyzeHydrophobicity($proteinSequence, $scales);
+        }
+    
+        if (in_array('molecular_mass', $analyses)) {
+            $results['molecular_mass'] = $this->calculateMolecularMass($proteinSequence, $isotopes);
+        }
+    
+        if (in_array('amino_acid_content', $analyses)) {
+            $results['amino_acid_content'] = $this->calculateAminoAcidContent($proteinSequence);
+        }
+    
+        if (in_array('isoelectric_point', $analyses)) {
+            $results['isoelectric_point'] = $this->calculateIsoelectricPoint($proteinSequence);
+        }
+    
+        if (in_array('protein_charge', $analyses)) {
+            $results['protein_charge'] = $this->calculateProteinCharge($proteinSequence, $pH);
+        }
+    
+        return response()->json($results);
     }
 
     private function dnaToProtein($dna)
@@ -101,5 +101,230 @@ class ProteinController extends Controller
         return $protein;
     }
 
-    //АНАЛИЗ ГИДРОФОБНОСТИ БЕЛКА!!!
+    private function analyzeHydrophobicity($proteinSequence, $scales)
+    {
+        $hydrophobicity = [];
+
+        // Шкала Кайте-Дулиттла
+        $kyteDoolittleScale = [
+            'A' => -0.5, 'R' => -4.5, 'N' => -3.5, 'D' => -3.5,
+            'C' => 2.5, 'E' => -3.5, 'Q' => -3.5, 'G' => -0.4,
+            'H' => -3.2, 'I' => 4.5, 'L' => 3.8, 'K' => -3.9,
+            'M' => 1.9, 'F' => 2.8, 'P' => -1.6, 'S' => -0.8,
+            'T' => -0.7, 'W' => -0.9, 'Y' => -1.3, 'V' => 4.2,
+        ];
+
+        // Шкала Хопфилда
+        $hopfieldScale = [
+            'A' => 1.8, 'R' => -2.5, 'N' => -0.6, 'D' => -0.9,
+            'C' => 2.5, 'E' => -0.7, 'Q' => -0.7, 'G' => -0.4,
+            'H' => -0.4, 'I' => 4.5, 'L' => 3.8, 'K' => -1.5,
+            'M' => 1.9, 'F' => 2.8, 'P' => -1.6, 'S' => -0.8,
+            'T' => -0.7, 'W' => -0.9, 'Y' => -1.3, 'V' => 4.2,
+        ];
+
+        // Шкала Гриффита
+        $griffithScale = [
+            'A' => 1.8, 'R' => -4.5, 'N' => -3.5, 'D' => -3.5,
+            'C' => 2.5, 'E' => -3.5, 'Q' => -3.5, 'G' => -0.4,
+            'H' => -3.2, 'I' => 4.5, 'L' => 3.8, 'K' => -3.9,
+            'M' => 1.9, 'F' => 2.8, 'P' => -1.6, 'S' => -0.8,
+            'T' => -0.7, 'W' => -0.9, 'Y' => -1.3, 'V' => 4.2,
+        ];
+        
+
+        foreach ($scales as $scale) {
+            switch ($scale) {
+                case 'kyteDoolittle':
+                    $hydrophobicity[$scale] = $this->calculateHydrophobicity($proteinSequence, $kyteDoolittleScale);
+                    break;
+                case 'hopfield':
+                    $hydrophobicity[$scale] = $this->calculateHydrophobicity($proteinSequence, $hopfieldScale);
+                    break;
+                case 'griffith':
+                    $hydrophobicity[$scale] = $this->calculateHydrophobicity($proteinSequence, $griffithScale);
+                    break;
+                default:
+                    $hydrophobicity[$scale] = 'Шкала не найдена';
+            }
+        }
+
+        return $hydrophobicity;
+    }
+
+    private function calculateHydrophobicity($proteinSequence, $scale)
+    {
+        $hydrophobicity = 0;
+        foreach (str_split($proteinSequence) as $aminoacid) {
+            $hydrophobicity += $scale[$aminoacid] ?? 0;
+        }
+        return $hydrophobicity / strlen($proteinSequence);
+    }
+
+    private function calculateMolecularMass($proteinSequence, $isotopes = [])
+    {
+        // Молекулярные массы аминокислот в их естественном содержании
+        $aminoacidMasses = [
+            'A' => 71.03711, 'R' => 156.10111, 'N' => 114.04293, 'D' => 115.02694,
+            'C' => 103.00919, 'E' => 129.04259, 'Q' => 128.05858, 'G' => 57.02146,
+            'H' => 137.05891, 'I' => 113.08406, 'L' => 113.08406, 'K' => 128.09496,
+            'M' => 131.04049, 'F' => 147.06841, 'P' => 97.05276, 'S' => 87.03203,
+            'T' => 101.04768, 'W' => 186.07931, 'Y' => 163.06333, 'V' => 99.06841,
+        ];
+    
+        // Изменение массы для изотопов
+        $isotopeMasses = [
+            '13C' => 1.00335, // Разница между 12C и 13C
+            '15N' => 0.99703, // Разница между 14N и 15N
+            'D' => 1.00628,   // Разница между H и D (дейтерий)
+        ];
+    
+        // Вычисляем брутто-формулу белка
+        $formula = [];
+        foreach (str_split($proteinSequence) as $aminoacid) {
+            if (isset($aminoacidMasses[$aminoacid])) {
+                $formula[$aminoacid] = ($formula[$aminoacid] ?? 0) + 1;
+            }
+        }
+    
+        // Рассчитываем массу
+        $molecularMass = 0;
+        foreach ($formula as $aminoacid => $count) {
+            $mass = $aminoacidMasses[$aminoacid] * $count;
+    
+            // Добавляем изотопную массу, если изотоп указан
+            foreach ($isotopes as $isotope) {
+                if (isset($isotopeMasses[$isotope])) {
+                    $mass += $isotopeMasses[$isotope] * $count;
+                }
+            }
+    
+            $molecularMass += $mass;
+        }
+    
+        return $molecularMass;
+    }
+
+    private function calculateAminoAcidContent($proteinSequence)
+{
+    // Инициализируем массивы для подсчёта аминокислот
+    $aminoAcidCount = [
+        'A' => 0, 'R' => 0, 'N' => 0, 'D' => 0,
+        'C' => 0, 'E' => 0, 'Q' => 0, 'G' => 0,
+        'H' => 0, 'I' => 0, 'L' => 0, 'K' => 0,
+        'M' => 0, 'F' => 0, 'P' => 0, 'S' => 0,
+        'T' => 0, 'W' => 0, 'Y' => 0, 'V' => 0,
+    ];
+
+    // Подсчитываем количество каждой аминокислоты
+    foreach (str_split($proteinSequence) as $aminoacid) {
+        if (isset($aminoAcidCount[$aminoacid])) {
+            $aminoAcidCount[$aminoacid]++;
+        }
+    }
+
+    // Рассчитываем процентное содержание
+    $totalAminoAcids = strlen($proteinSequence);
+    $aminoAcidPercentage = [];
+    foreach ($aminoAcidCount as $aminoacid => $count) {
+        $aminoAcidPercentage[$aminoacid] = ($count / $totalAminoAcids) * 100;
+    }
+
+    return [
+        'count' => $aminoAcidCount,
+        'percentage' => $aminoAcidPercentage,
+    ];
+}
+private function calculateIsoelectricPoint($proteinSequence)
+{
+    // pKa значения для терминальных групп и боковых цепей аминокислот
+    $pKaValues = [
+        'N_term' => 9.69, 'C_term' => 2.34,
+        'D' => 3.86, 'E' => 4.25, 'C' => 8.33, 'Y' => 10.07,
+        'K' => 10.54, 'R' => 12.48, 'H' => 6.00,
+    ];
+
+    // Начальные значения pH для дихотомии
+    $lowPH = 0.0;
+    $highPH = 14.0;
+    $midPH = 0.0;
+    $tolerance = 0.001; // Точность
+
+    // Функция для расчёта заряда белка при заданном pH
+    $calculateCharge = function($pH) use ($proteinSequence, $pKaValues) {
+        $charge = 0.0;
+
+        // Заряд N-концевой группы
+        $charge += 1 / (1 + pow(10, $pH - $pKaValues['N_term']));
+
+        // Заряд C-концевой группы
+        $charge -= 1 / (1 + pow(10, $pKaValues['C_term'] - $pH));
+
+        // Заряд боковых цепей аминокислот
+        foreach (count_chars($proteinSequence, 1) as $aminoacid => $count) {
+            $aminoacid = chr($aminoacid);
+            if (isset($pKaValues[$aminoacid])) {
+                if (in_array($aminoacid, ['D', 'E', 'C', 'Y'])) {
+                    // Кислые аминокислоты
+                    $charge -= $count / (1 + pow(10, $pKaValues[$aminoacid] - $pH));
+                } elseif (in_array($aminoacid, ['K', 'R', 'H'])) {
+                    // Основные аминокислоты
+                    $charge += $count / (1 + pow(10, $pH - $pKaValues[$aminoacid]));
+                }
+            }
+        }
+
+        return $charge;
+    };
+
+    // Метод дихотомии для нахождения pH, при котором заряд равен 0
+    while (($highPH - $lowPH) > $tolerance) {
+        $midPH = ($lowPH + $highPH) / 2;
+        $charge = $calculateCharge($midPH);
+
+        if ($charge > 0) {
+            $lowPH = $midPH;
+        } else {
+            $highPH = $midPH;
+        }
+    }
+
+    return $midPH;
+}
+private function calculateProteinCharge($proteinSequence, $pH)
+{
+    // pKa значения для терминальных групп и боковых цепей аминокислот
+    $pKaValues = [
+        'N_term' => 9.69, 'C_term' => 2.34,
+        'D' => 3.86, 'E' => 4.25, 'C' => 8.33, 'Y' => 10.07,
+        'K' => 10.54, 'R' => 12.48, 'H' => 6.00,
+    ];
+
+    // Инициализируем заряд
+    $charge = 0.0;
+
+    // Заряд N-концевой группы
+    $charge += 1 / (1 + pow(10, $pH - $pKaValues['N_term']));
+
+    // Заряд C-концевой группы
+    $charge -= 1 / (1 + pow(10, $pKaValues['C_term'] - $pH));
+
+    // Подсчитываем количество каждой аминокислоты
+    $aminoAcidCounts = array_count_values(str_split($proteinSequence));
+
+    // Заряд боковых цепей аминокислот
+    foreach ($aminoAcidCounts as $aminoacid => $count) {
+        if (isset($pKaValues[$aminoacid])) {
+            if (in_array($aminoacid, ['D', 'E', 'C', 'Y'])) {
+                // Кислые аминокислоты
+                $charge -= $count / (1 + pow(10, $pKaValues[$aminoacid] - $pH));
+            } elseif (in_array($aminoacid, ['K', 'R', 'H'])) {
+                // Основные аминокислоты
+                $charge += $count / (1 + pow(10, $pH - $pKaValues[$aminoacid]));
+            }
+        }
+    }
+
+    return $charge;
+}
 }

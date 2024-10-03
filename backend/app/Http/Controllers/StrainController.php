@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AnalyzeStrain;
 use App\Models\strain;
+use App\Models\Protein;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -14,56 +16,65 @@ use App\Traits\PaginationTrait;
 use App\Traits\QueryBuilderTrait;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Storage;
+use GuzzleHttp\Client; 
+
 
 
 class StrainController extends Controller
 {
     use QueryBuilderTrait, PaginationTrait;
     public function store(StoreStrainRequest $request)
-    {
-        if (!Auth::user()->can('create', Strain::class)) {
-            return $this->errorResponse('Отсутствуют разрешения', [], 403);
-        }
-
-        // Проверяем, был ли загружен файл
-        if ($request->hasFile('file')) {
-            // Получаем файл
-            $file = $request->file('file');
-
-            // Проверяем, что файл имеет правильный формат
-            if ($file->getClientOriginalExtension() !== 'txt') {
-                return $this->errorResponse('Файл должен быть формата .txt', [], 400);
-            }
-
-            // Читаем содержимое файла
-            $content = file_get_contents($file->getRealPath());
-
-            // Удаляем все символы, кроме A, C, T, G
-            $filteredContent = preg_replace('/[^ACTG]/', '', $content);
-
-            // Получаем имя из поля name в запросе
-            $name = $request->input('name');
-            // Формируем новое имя файла с расширением .txt
-            $newFileName = $name . '.txt';
-
-           // Сохраняем отфильтрованное содержимое в новый файл
-            $path = Storage::disk('public')->put('uploads/' . $newFileName, $filteredContent);
-
-            // Получаем полный URL к файлу
-            $url = Storage::url('app/public/uploads/' . $newFileName);
-            Log::info($url);
-            // Создаем запись в базе данных
-            $strain = Strain::create($request->validated() + [
-                'author_id' => Auth::id(),
-                'link' => $url, // Сохраняем полный URL к файлу в поле link
-            ]);
-
-            return $this->successResponse($strain, 'Запись о штамме успешно создана', 200);
-        }
-
-        return $this->errorResponse('Файл не загружен', [], 400);
+{
+    if (!Auth::user()->can('create', Strain::class)) {
+        return $this->errorResponse('Отсутствуют разрешения', [], 403);
     }
 
+    // Проверяем, был ли загружен файл
+    if ($request->hasFile('file')) {
+        // Получаем файл
+        $file = $request->file('file');
+
+        // Проверяем, что файл имеет правильный формат
+        if ($file->getClientOriginalExtension() !== 'txt') {
+            return $this->errorResponse('Файл должен быть формата .txt', [], 400);
+        }
+
+        // Читаем содержимое файла
+        $content = file_get_contents($file->getRealPath());
+
+        // Приводим содержимое к верхнему регистру
+        $contentUpper = strtoupper($content);
+        Log::info('Последовательность ДНК в верхнем регистре: '. $contentUpper);
+
+        // Удаляем все символы, кроме A, C, T, G
+        $filteredContent = preg_replace('/[^GTAC]/', '', $contentUpper);
+
+        Log::info('Отфильтрованная последовательность ДНК: '. $filteredContent);
+        // Получаем имя из поля name в запросе
+        $name = $request->input('name');
+        // Формируем новое имя файла с расширением .txt
+        $newFileName = $name . '.txt';
+
+        // Сохраняем отфильтрованное содержимое в новый файл
+        $path = Storage::disk('public')->put('uploads/' . $newFileName, $filteredContent);
+
+
+        // Получаем полный URL к файлу
+        $url = Storage::url('app/public/uploads/' . $newFileName);
+        Log::info($url);
+
+        // Создаем запись в базе данных
+        $strain = Strain::create($request->validated() + [
+            'author_id' => Auth::id(),
+            'link' => $url, // Сохраняем полный URL к файлу в поле link
+        ]);
+
+
+        return $this->successResponse($strain, 'Запись о штамме успешно создана', 200);
+    }
+
+    return $this->errorResponse('Файл не загружен', [], 400);
+}
 
     public function update(UpdateStrainRequest $request, int $id)
     {
@@ -200,4 +211,80 @@ class StrainController extends Controller
         // Возвращаем успешный ответ
         return $this->successResponse($strains->items(), $paginationData, Response::HTTP_OK);
     }
+
+    public function findRepeats(Request $request)
+    {
+        Log::info('получить !');
+
+        // Получаем название штамма из запроса
+        $strainName = $request->input('strain_name');
+        if (!$strainName) {
+            return response()->json(['error' => 'Штамм не указан'], 400);
+        }
+
+        // Получаем штамм из базы данных
+        $strain = Strain::where('name', $strainName)->first();
+        if (!$strain) {
+            return response()->json(['error' => 'Штамм не найден'], 404);
+        }
+
+        // Получаем путь к файлу из ссылки
+        $filePath = 'C:/ARM-genetic/backend' . $strain->link;
+        Log::info($filePath);
+        if (!file_exists($filePath)) {
+            return response()->json(['error' => 'Файл не найден'], 404);
+        }
+
+        // Отправляем файл на сервер для анализа
+        $client = new Client();
+        $response = $client->post('http://localhost:5000/find_repeats', [
+            'multipart' => [
+                [
+                    'name'     => 'file',
+                    'contents' => fopen($filePath, 'r'),
+                    'filename' => basename($filePath),
+                ],
+                [
+                    'name'     => 'min_length',
+                    'contents' => 23,
+                ],
+                [
+                    'name'     => 'max_length',
+                    'contents' => 44,
+                ]
+            ]
+        ]);
+
+        $repeats = json_decode($response->getBody(), true);
+
+        // Сохраняем результаты анализа в базе данных
+        foreach ($repeats['spacers_info'] as $repeatInfo) {
+            AnalyzeStrain::create([
+                'author_id' => Auth::id(), // Используем Auth::id() для получения ID текущего пользователя
+                'strain_id' => $strain->id,
+                'repeat_sequence' => $repeatInfo['repeat'],
+                'repeat_positions' => json_encode($repeatInfo['repeat_positions']), // Преобразование в JSON
+                'spacer_sequence' => $repeatInfo['spacer'],
+                'spacer_positions' => json_encode($repeatInfo['spacer_positions']), // Преобразование в JSON
+                'is_known' => $repeatInfo['is_known'],
+                'status' => 'на рассмотрении'
+            ]);
+        }
+
+        return response()->json($repeats);
+    }
+
+    public function getAllStrainNames()
+{
+    // Извлекаем все имена штаммов
+    $strainNames = Strain::pluck('name');
+
+    // Проверяем, есть ли записи
+    if ($strainNames->isEmpty()) {
+        return $this->errorResponse('Записи не найдены', [], Response::HTTP_NOT_FOUND);
+    }
+
+    // Возвращаем успешный ответ
+    return $this->successResponse($strainNames, [], Response::HTTP_OK);
+}
 }

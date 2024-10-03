@@ -23,6 +23,22 @@ return new class extends Migration
 
             $table->foreign('author_id')->references('id')->on('user_login_data')->onDelete('cascade');
         });
+
+        Schema::create('analyze_strain', function (Blueprint $table) {
+            $table->increments('id');
+            $table->timestampsTz();
+            $table->integer('author_id')->unsigned();
+            $table->integer('strain_id')->unsigned(); // Связь с таблицей strain
+            $table->text('repeat_sequence');
+            $table->json('repeat_positions'); // Используем JSON для хранения массивов
+            $table->text('spacer_sequence');
+            $table->json('spacer_positions'); // Используем JSON для хранения массивов
+            $table->boolean('is_known')->default(false);
+            $table->string('status')->default('pending'); // Поле для статуса анализа
+
+            $table->foreign('author_id')->references('id')->on('user_login_data')->onDelete('cascade');
+            $table->foreign('strain_id')->references('id')->on('strain')->onDelete('cascade');
+        });
     }
 
     /**
@@ -31,5 +47,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('strain');
+        Schema::dropIfExists('analyze_strain');
     }
 };

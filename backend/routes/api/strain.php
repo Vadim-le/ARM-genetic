@@ -12,6 +12,10 @@ Route::group([
     Route::put('{id}', [StrainController::class, 'update']);
     Route::post('', [StrainController::class, 'store']);
     Route::delete('{id}', [StrainController::class, 'destroy']);
+    Route::post('/find-repeats', [StrainController::class, 'findRepeats']);
+    Route::get('/name', [StrainController::class, 'getAllStrainNames']);
+    
+
 });
 
 Route::group([
