@@ -93,7 +93,7 @@ export default {
       if (!this.selectedStrain) return;
       console.log(this.selectedStrain)
       try {
-        const response = await fetch(`/api/analyze_strains?name=${this.selectedStrain}`, {
+        const response = await fetch(`http://localhost:8000/api/strain/analyze_records?name=${this.selectedStrain}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -113,24 +113,26 @@ export default {
     },
     // Обновляем статус записи
     async updateStatus(recordId, newStatus) {
-      try {
-        const response = await fetch(`/api/analyze_strains/${recordId}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ status: newStatus }),
-        });
+    const token = localStorage.getItem('token');
+    try {
+      const response = await fetch(`http://localhost:8000/api/strain/update_status/${recordId}`, {
+        method: 'PATCH', // Используйте PATCH, если вы частично обновляете ресурс
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
 
-        if (!response.ok) {
-          throw new Error('Ошибка сети: ' + response.statusText);
-        }
-
-        // Если обновление прошло успешно, удаляем запись из списка
-        this.analyzeStrains = this.analyzeStrains.filter(record => record.id !== recordId);
-      } catch (error) {
-        console.error('Ошибка при обновлении статуса:', error);
+      if (!response.ok) {
+        throw new Error('Ошибка сети: ' + response.statusText);
       }
+
+      // Если обновление прошло успешно, удаляем запись из списка
+      this.analyzeStrains = this.analyzeStrains.filter(record => record.id !== recordId);
+    } catch (error) {
+      console.error('Ошибка при обновлении статуса:', error);
+    }
     }
   }
 };

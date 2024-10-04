@@ -13,11 +13,6 @@
         :class="{ 'selected-category': selectedCategory === 'storage_stamms' }">
         Хранилище штаммов
       </v-list-item>
-      <v-list-item 
-        @click="selectPage('storage_proteins')" 
-        :class="{ 'selected-category': selectedCategory === 'storage_proteins' }">
-        Хранилище белка
-      </v-list-item>
     </v-list>
     <v-list-item 
       @click="toggleToolsDetails" 
@@ -31,24 +26,9 @@
         Полный анализ белка
       </v-list-item>
       <v-list-item 
-        @click="selectPage('tool_hydrophobic')" 
-        :class="{ 'selected-category': selectedCategory === 'tool_hydrophobic' }">
-        Поиск cas-генов
-      </v-list-item>
-      <v-list-item 
         @click="selectPage('tool_mass')" 
         :class="{ 'selected-category': selectedCategory === 'tool_mass' }">
         Поиск повторяющихся последовательнстей
-      </v-list-item>
-      <v-list-item 
-        @click="selectPage('tool_amino')" 
-        :class="{ 'selected-category': selectedCategory === 'tool_amino' }">
-        Анализ аминокислотного состава
-      </v-list-item>
-      <v-list-item 
-        @click="selectPage('tool_iso')" 
-        :class="{ 'selected-category': selectedCategory === 'tool_iso' }">
-        Определение изоэлектрической точки
       </v-list-item>
     </v-list>
       <v-list-item 
@@ -56,7 +36,7 @@
       :class="{ 'selected-category': selectedCategory === 'analyze_tools' }">
       Инструменты анализа
     </v-list-item>
-    <v-list v-show="toggleAnalyzeToolsDetails" class="pl-4">
+    <v-list v-show="showAnalyzeToolsDetails" class="pl-4">
       <v-list-item 
         @click="selectPage('nucleotide_analyze')" 
         :class="{ 'selected-category': selectedCategory === 'nucleotide_analyze' }">
@@ -122,7 +102,7 @@ export default {
       drawer: false, // Состояние для управления видимостью меню
       showStammDetails: false, // Состояние для управления видимостью деталей штаммов
       showToolsDetails: false, // Состояние для управления видимостью деталей штаммов
-      showAnalzeToolsDetails: false,
+      showAnalyzeToolsDetails: false,
     };
   },
   computed: {
