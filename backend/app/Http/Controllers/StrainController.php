@@ -276,16 +276,66 @@ class StrainController extends Controller
     }
 
     public function getAllStrainNames()
-{
-    // Извлекаем все имена штаммов
-    $strainNames = Strain::pluck('name');
+    {
+        // Извлекаем все имена штаммов
+        $strainNames = Strain::pluck('name');
 
-    // Проверяем, есть ли записи
-    if ($strainNames->isEmpty()) {
-        return $this->errorResponse('Записи не найдены', [], Response::HTTP_NOT_FOUND);
+        // Проверяем, есть ли записи
+        if ($strainNames->isEmpty()) {
+            return $this->errorResponse('Записи не найдены', [], Response::HTTP_NOT_FOUND);
+        }
+
+        // Возвращаем успешный ответ
+        return $this->successResponse($strainNames, [], Response::HTTP_OK);
     }
 
-    // Возвращаем успешный ответ
-    return $this->successResponse($strainNames, [], Response::HTTP_OK);
-}
+    public function getAnalyzeRecordsByStrainName(Request $request)
+    {
+        // Получаем название штамма из запроса
+        $strainName = $request->input('name');
+
+        // Находим штамм по названию
+        $strain = Strain::where('name', $strainName)->first();
+
+        // Проверяем, найден ли штамм
+        if (!$strain) {
+            return response()->json([
+                'message' => 'Штамм не найден'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        // Извлекаем все записи анализа для найденного штамма
+        $analyzeRecords = AnalyzeStrain::where('strain_id', $strain->id)->where('status', 'на рассмотрении')->get();
+
+        // Возвращаем записи анализа
+        return response()->json($analyzeRecords, Response::HTTP_OK);
+    }
+
+    public function updateAnalyzeRecordStatus(Request $request, $id)
+    {
+        // Получаем новый статус из запроса
+        $newStatus = $request->input('status');
+
+        Log::info($request);
+
+        // Находим запись по ID
+        $analyzeRecord = AnalyzeStrain::find($id);
+
+        // Проверяем, найдена ли запись
+        if (!$analyzeRecord) {
+            return response()->json([
+                'message' => 'Запись не найдена'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        // Обновляем статус
+        $analyzeRecord->status = $newStatus;
+        $analyzeRecord->save();
+
+        // Возвращаем успешный ответ
+        return response()->json([
+            'message' => 'Статус успешно обновлен',
+            'record' => $analyzeRecord
+        ], Response::HTTP_OK);
+    }
 }
