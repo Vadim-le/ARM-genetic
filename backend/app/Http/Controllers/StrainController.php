@@ -151,66 +151,65 @@ class StrainController extends Controller
     }
 
     public function getStrains(Request $request)
-    {
-        // Проверка прав доступа
-        // if (!Auth::user()->can('viewAny', Strain::class)) {
-        //     return $this->errorResponse('Нет прав на просмотр', [], Response::HTTP_FORBIDDEN);
-        // }
+{
+    // Проверка прав доступа
+    // if (!Auth::user()->can('viewAny', Strain::class)) {
+    //     return $this->errorResponse('Нет прав на просмотр', [], Response::HTTP_FORBIDDEN);
+    // }
 
-        // Начинаем запрос
-        $query = Strain::query();
+    // Начинаем запрос
+    $query = Strain::query();
 
-        // Применяем фильтры, если они заданы
-        if ($request->has('type_of_bacteria')) {
-            $query->where('type_of_bacteria', $request->input('type_of_bacteria'));
-        }
-        if ($request->has('id')) {
-            $query->where('id', $request->input('id'));
-        }
-        if ($request->has('name')) {
-            $query->where('name', 'LIKE', '%' . $request->input('name') . '%');
-        }
-        if ($request->has('link')) {
-            $query->where('link', 'LIKE', '%' . $request->input('link') . '%');
-        }
-        if ($request->has('place_of_allocation')) {
-            $query->where('place_of_allocation', 'LIKE', '%' . $request->input('place_of_allocation') . '%');
-        }
-        if ($request->has('year_of_allocation')) {
-            $query->where('year_of_allocation', $request->input('year_of_allocation'));
-        }
+    // Применяем фильтры, если они заданы
+    if ($request->has('type_of_bacteria')) {
+        $query->where('type_of_bacteria', $request->input('type_of_bacteria'));
+    }
+    if ($request->has('id')) {
+        $query->where('id', $request->input('id'));
+    }
+    if ($request->has('name')) {
+        $query->where('name', 'LIKE', '%' . $request->input('name') . '%');
+    }
+    if ($request->has('link')) {
+        $query->where('link', 'LIKE', '%' . $request->input('link') . '%');
+    }
+    if ($request->has('place_of_allocation')) {
+        $query->where('place_of_allocation', 'LIKE', '%' . $request->input('place_of_allocation') . '%');
+    }
+    if ($request->has('year_of_allocation')) {
+        $query->where('year_of_allocation', $request->input('year_of_allocation'));
+    }
 
-        // Получаем результаты с пагинацией
-        $perPage = $request->get('per_page'); // Значение по умолчанию 10
-        //$perPage = $request->get('per_page'); // когда пагинацию на клиенет сделаю тогда здесь уже параметр по умолчанию выставить
-        $strains = $query->paginate($perPage);
+    // Загрузка связанных данных из analyze_strain
+    $query->with(['analyzeStrains' => function ($query) {
+        $query->where('status', 'approved');
+    }]);
 
-        // Проверяем, есть ли записи
-        if ($strains->isEmpty()) {
-            return $this->errorResponse('Записи не найдены', [], Response::HTTP_NOT_FOUND);
-        }
+    // Получаем результаты с пагинацией
+    $perPage = $request->get('per_page');
+    $strains = $query->paginate($perPage);
 
-       // Если указан ID, добавляем содержимое файла
-        if ($request->has('id')) {
-            foreach ($strains as $strain) {
-                if ($strain->link) {
-                    // Извлекаем относительный путь из URL
-                    //$relativePath = str_replace('/storage/', '', $strain->link); // Убираем /storage/
-                    $filePath = 'C:/ARM-genetic/backend' . $strain->link;
-                    
-                    // Получаем содержимое файла из хранилища
-                    //$strain->file_content = Storage::disk('public')->get($relativePath);
-                    $strain->file_content = file_get_contents($filePath);
-                }
+    // Проверяем, есть ли записи
+    if ($strains->isEmpty()) {
+        return $this->errorResponse('Записи не найдены', [], Response::HTTP_NOT_FOUND);
+    }
+
+    // Если указан ID, добавляем содержимое файла
+    if ($request->has('id')) {
+        foreach ($strains as $strain) {
+            if ($strain->link) {
+                $filePath = 'C:/ARM-genetic/backend' . $strain->link;
+                $strain->file_content = file_get_contents($filePath);
             }
         }
-
-        // Формируем данные пагинации
-        $paginationData = $this->makePaginationData($strains);
-
-        // Возвращаем успешный ответ
-        return $this->successResponse($strains->items(), $paginationData, Response::HTTP_OK);
     }
+
+    // Формируем данные пагинации
+    $paginationData = $this->makePaginationData($strains);
+
+    // Возвращаем успешный ответ
+    return $this->successResponse($strains->items(), $paginationData, Response::HTTP_OK);
+}
 
     public function findRepeats(Request $request)
     {

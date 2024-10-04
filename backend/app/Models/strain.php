@@ -49,4 +49,10 @@ class strain extends Model
         return $this->hasOne(Protein::class, 'strain_id');
     }
 
+    // В модели Strain
+    public function analyzeStrains()
+    {
+        return $this->hasMany(AnalyzeStrain::class);
+    }
+
 }
