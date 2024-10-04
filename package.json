@@ -13,8 +13,10 @@
     "core-js": "^3.37.1",
     "jwt-decode": "^4.0.0",
     "roboto-fontface": "*",
+    "three": "^0.169.0",
     "vue": "^3.4.31",
     "vue-chartjs": "^5.3.1",
+    "vue-highlight-words": "^3.0.1",
     "vue-jwt-decode": "^0.1.0",
     "vuetify": "^3.7.2",
     "vuex": "^4.0.2"

@@ -1,72 +1,141 @@
 <template>
     <v-app>
-        <v-main>
-            <v-container fluid class="d-flex flex-column" style="max-width: 1600px; margin: auto;">
-                <v-row>
-                    <v-col cols="12" sm="6" md="4">
-                        <v-text-field label="Name" v-model="name" :disabled="!isEditing"></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                        <template v-if="isEditing">
-                        <v-select
-                            label="Тип бактерии"
-                            v-model="type_of_bacteria"
-                            :items="bacteries"
-                            :disabled="!isEditing"
-                            return-object
-                        ></v-select>
-                        </template>
-                        <template v-else>
-                        <v-text-field
-                            label="Тип бактерии"
-                            v-model="type_of_bacteria"
-                            :disabled="!isEditing"
-                        ></v-text-field>
-                        </template>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                        <v-autocomplete
-      v-model="place_of_allocation"
-      :items="countries"
-      :search-input.sync="search"
-      :disabled="!isEditing"
-      label="Place Of Allocation"
-    ></v-autocomplete>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                        <template v-if="isEditing">
-                        <v-select
-                            label="Год выделения штамма"
-                            v-model="year_of_allocation"
-                            :items="years"
-                            :disabled="!isEditing"
-                            return-object
-                        ></v-select>
-                        </template>
-                        <template v-else>
-                        <v-text-field
-                            label="Год выделения штамма"
-                            v-model="year_of_allocation"
-                            :disabled="!isEditing"
-                        ></v-text-field>
-                        </template>
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="12">
-                        <v-textarea label="Description" v-model="sequence" :readonly="!isEditing"></v-textarea>
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col cols="12">
-                        <v-btn @click="toggleEdit" v-if="isAdmin">{{ isEditing ? 'Сохранить изменения' : 'Редактировать' }}</v-btn>
-                        <v-btn @click="$router.go(-1)">Назад</v-btn>
-                    </v-col>
-                </v-row>
-            </v-container>
-        </v-main>
+      <v-main>
+        <v-container fluid class="d-flex" style="max-width: 1400px; margin: auto;">
+        
+        <!-- Боковая колонка для кнопки Назад -->
+        <v-col cols="auto" class="d-flex flex-column align-start back-button">
+          <v-btn
+            icon
+            @click="$router.go(-1)"
+            class="mb-4"
+          >
+            <v-icon>mdi-arrow-left</v-icon>
+          </v-btn>
+        </v-col>
+        
+        <!-- Основное содержимое -->
+        <v-col class="d-flex flex-column">
+          
+          <!-- Form Section in Card -->
+          <v-card class="my-4">
+            <v-card-title>Общая информация о штамме</v-card-title>
+            <v-card-text>
+              <v-row>
+                <v-col cols="12" sm="6" md="3">
+                  <v-text-field
+                    label="Name"
+                    v-model="name"
+                    :disabled="!isEditing"
+                    outlined
+                    dense
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
+                  <template v-if="isEditing">
+                    <v-select
+                      label="Тип бактерии"
+                      v-model="type_of_bacteria"
+                      :items="bacteries"
+                      :disabled="!isEditing"
+                      return-object
+                      outlined
+                      dense
+                    ></v-select>
+                  </template>
+                  <template v-else>
+                    <v-text-field
+                      label="Тип бактерии"
+                      v-model="type_of_bacteria"
+                      :disabled="!isEditing"
+                      outlined
+                      dense
+                    ></v-text-field>
+                  </template>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
+                  <v-autocomplete
+                    v-model="place_of_allocation"
+                    :items="countries"
+                    :search-input.sync="search"
+                    :disabled="!isEditing"
+                    label="Place Of Allocation"
+                    outlined
+                    dense
+                  ></v-autocomplete>
+                </v-col>
+                <v-col cols="12" sm="6" md="3">
+                  <template v-if="isEditing">
+                    <v-select
+                      label="Год выделения штамма"
+                      v-model="year_of_allocation"
+                      :items="years"
+                      :disabled="!isEditing"
+                      return-object
+                      outlined
+                      dense
+                    ></v-select>
+                  </template>
+                  <template v-else>
+                    <v-text-field
+                      label="Год выделения штамма"
+                      v-model="year_of_allocation"
+                      :disabled="!isEditing"
+                      outlined
+                      dense
+                    ></v-text-field>
+                  </template>
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
+  
+          <!-- Description Section in Card -->
+          <v-card class="my-4">
+            <v-card-title>Полная последовательность штамма</v-card-title>
+            <v-card-text>
+              <v-textarea
+                v-model="sequence"
+                :readonly="!isEditing"
+                outlined
+                dense
+                rows="4"
+              ></v-textarea>
+            </v-card-text>
+          </v-card>  
+          <!-- Data Table Section in Card -->
+          <v-card class="my-4">
+            <v-card-title>Спэйсеры и повторяющиеся последовательности</v-card-title>
+            <v-card-text>
+              <v-data-table
+                :headers="headers"
+                :items="analyzeStrains"
+                :items-per-page="5"
+                class="elevation-1"
+                dense
+              >
+        
+              </v-data-table>
+            </v-card-text>
+          </v-card>
+          <v-row justify="center">
+  <v-col cols="12" sm="6" md="4" class="d-flex justify-center">
+    <v-btn
+      @click="toggleEdit"
+      v-if="isAdmin"
+      color="primary"
+      outlined
+      class="w-100"
+    >
+      {{ isEditing ? 'Сохранить изменения' : 'Редактировать' }}
+    </v-btn>
+  </v-col>
+</v-row>
+</v-col>
+        </v-container>
+      </v-main>
     </v-app>
-</template>
+  </template>
 
 <script>
 import { mapGetters } from 'vuex'; // Импортируем mapGetters для доступа к геттерам Vuex
@@ -82,6 +151,14 @@ export default {
             type_of_bacteria: '',
             isEditing: false, // Флаг для отслеживания режима редактирования
             link: '',
+            headers: [
+        {
+          title: 'Повторяющиеся последовательности', key: 'repeat_sequence', align: 'start', sortable: false },
+        { title: 'Индексы повторяющихся последовательностей', key: 'repeat_positions', align: 'end', sortable: false },
+        { title: 'Спэйсеры', key: 'spacer_sequence', align: 'end', sortable: false },
+        { title: 'Индексы спэйсеров', key: 'spacer_positions', align: 'end', sortable: false },
+
+      ],
             years: this.generateYears(), // Массив годов
             bacteries: ['Стафилококк', 'Чума'],
             countries: [
@@ -281,7 +358,9 @@ export default {
             'Йемен',
             'Замбия',
             'Зимбабве'
-      ]
+      ],
+      analyzeStrains: [], // Данные из analyze_strains
+
         }
     },
     watch: {
@@ -508,12 +587,12 @@ export default {
             const id = this.id;
             try {
                 const url = new URL('http://localhost:8000/api/strain');
-                url.searchParams.append('id', id); // Добавляем параметр id
+                url.searchParams.append('id', id);
 
                 const response = await fetch(url, {
                     method: 'GET',
                     headers: {
-                        'Authorization': `Bearer ${token}`, // Добавляем токен в заголовок
+                        'Authorization': `Bearer ${token}`,
                     },
                 });
 
@@ -521,20 +600,23 @@ export default {
                     throw new Error('Ошибка сети: ' + response.statusText);
                 }
 
-                const result = await response.json(); // Получаем ответ от сервера
+                const result = await response.json();
                 console.log('Данные профиля пользователя:', result);
 
-                // Проверяем, есть ли данные
                 if (result.data) {
-                    const data = result.data; // Извлекаем объект data
+                    const data = result.data[0];
 
-                    // Заполняем поля метаданных
-                    this.name = data[0].name || ''; // Используем пустую строку по умолчанию
-                    this.place_of_allocation = data[0].place_of_allocation || ''; // Используем пустую строку по умолчанию
-                    this.sequence = data[0].file_content || '';
-                    this.year_of_allocation = data[0].year_of_allocation || '';
-                    this.link = data[0].link || ''; // Используем пустую строку по умолчанию
-                    this.type_of_bacteria = data[0].type_of_bacteria || '';
+                    this.name = data.name || '';
+                    this.place_of_allocation = data.place_of_allocation || '';
+                    this.sequence = data.file_content || '';
+                    this.year_of_allocation = data.year_of_allocation || '';
+                    this.link = data.link || '';
+                    this.type_of_bacteria = data.type_of_bacteria || '';
+
+                    if (data.analyze_strains) {
+                        this.analyzeStrains = data.analyze_strains;
+                    }
+             
                 } else {
                     console.error('Нет данных в ответе:', result);
                 }
@@ -593,3 +675,10 @@ export default {
     }
 }
 </script>
+<style scoped>
+@media (max-width: 600px) {
+  .back-button {
+    display: none !important; /* Скрыть элемент на экранах до 600px */
+  }
+}
+</style>

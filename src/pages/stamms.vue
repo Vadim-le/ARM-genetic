@@ -1,14 +1,18 @@
 <template>
   <v-responsive class="border rounded">
     <v-app>
-
       <v-main class="flex-grow-1">
-        <v-container fluid class="d-flex flex-column" style="max-width: 1600px; margin: auto;">  
+        <v-container
+          fluid
+          class="d-flex flex-column"
+          :class="{ 'blur-background': showForm }"
+          style="max-width: 1600px; margin: auto;"
+        >
           <v-btn color="primary" class="mt-4" @click="showForm = true">Добавить</v-btn>
           <v-dialog v-model="showForm" max-width="800">
-            <v-card>
-              <v-form ref="form" @submit.prevent="saveStrainData"> 
-                <v-card-title class="text-h5">Добавить штамм</v-card-title>
+            <v-card class="rounded-xl">
+              <v-form ref="form" @submit.prevent="saveStrainData">
+                <v-card-title class="text-h5 d-flex justify-center">Добавить штамм</v-card-title>
                 <v-card-text>
                   <v-container>
                     <v-row>
@@ -18,16 +22,8 @@
                           label="Название штамма *"
                           required
                           :rules="[rules.required]"
+                          variant="outlined"
                         ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" md="12">
-                        <v-select
-                          v-model="year_of_allocation"
-                          :items="years"
-                          label="Год выделения *"
-                          required
-                          :rules="[rules.required]"
-                        ></v-select>
                       </v-col>
                       <v-col cols="12" md="12">
                         <v-text-field
@@ -35,24 +31,48 @@
                           label="Место выделения *"
                           required
                           :rules="[rules.required]"
+                          variant="outlined"
                         ></v-text-field>
                       </v-col>
+                      <v-row justify="center" class="w-100">
+                        <v-col cols="12" md="6" class="d-flex justify-center">
+                          <v-select
+                            variant="outlined"
+                            v-model="year_of_allocation"
+                            :items="years"
+                            label="Год выделения *"
+                            required
+                            :rules="[rules.required]"
+                          ></v-select>
+                        </v-col>
+                      </v-row>
                       <v-col cols="12" md="12">
-                        <v-file-input
-                          v-model="file"
-                          label="Штамм *"
-                          accept=".txt"
-                          required
-                          :rules="[rules.required]"
-                        ></v-file-input>
+                        <v-card class="dashed-border pa-0" variant="outlined">
+                          <div class="d-flex justify-center">
+                            <v-file-input
+                              v-model="file"
+                              label="Штамм *"
+                              accept=".txt"
+                              required
+                              :rules="[rules.required]"
+                              variant="solo"
+                              prepend-icon=""
+                              class="file-input-width"
+                            ></v-file-input>
+                          </div>
+                          <v-card-text class="d-flex justify-center align-center" style="height: 150px;">
+                            <v-icon class="custom-icon-size" color="blue lighten-1">mdi-file-upload-outline</v-icon>
+                          </v-card-text>
+                        </v-card>
                       </v-col>
                     </v-row>
                   </v-container>
                 </v-card-text>
                 <v-card-actions>
                   <v-spacer></v-spacer>
-                  <v-btn color="blue darken-1" text @click="showForm = false">Отмена</v-btn>
                   <v-btn color="blue darken-1" text type="submit">Сохранить</v-btn>
+                  <v-btn color="red darken-1" text @click="showForm = false">Отмена</v-btn>
+                  <v-spacer></v-spacer>
                 </v-card-actions>
               </v-form>
             </v-card>
@@ -70,13 +90,20 @@
                 label="Search"
                 density="compact"
               ></v-text-field>
-            </template>  
+            </template>
             <template v-slot:item.name="{ item }">
               <a @click.prevent="goToItemDetail(item.id)" style="cursor: pointer; color: blue; text-decoration: underline;">{{ item.name }}</a>
             </template>
           </v-data-table>
         </v-container>
-      </v-main>  
+        <!-- Добавляем v-snackbar для уведомлений -->
+        <v-snackbar v-model="snackbar" :timeout="snackbarTimeout">
+          {{ snackbarText }}
+ <template v-slot:actions>
+            <v-btn color="pink" variant="text" @click="snackbar = false">Закрыть</v-btn>
+          </template>
+        </v-snackbar>
+      </v-main>
     </v-app>
   </v-responsive>
 </template>
@@ -88,11 +115,9 @@ export default {
       search: '',
       years: this.generateYears(),
       headers: [
-        { title: 'ID', value: 'id' },
-        { title: 'Name', value: 'name' },
-        { title: 'Link', value: 'link' },
-        { title: 'Place of Allocation', value: 'place_of_allocation' },
-        { title: 'Year of Allocation', value: 'year_of_allocation' },
+        { title: 'Название', value: 'name' },
+        { title: 'Место выделения', value: 'place_of_allocation' },
+        { title: 'Год выделения', value: 'year_of_allocation' },
       ],
       items: [],
       pagination: {
@@ -104,6 +129,9 @@ export default {
       year_of_allocation: '',
       location: '',
       file: null,
+      snackbar: false, // Состояние snackbar
+      snackbarText: '', // Текст snackbar
+      snackbarTimeout: 5000, // Время показа snackbar в миллисекундах
       rules: {
         required: (value) => !!value || 'Обязательное поле',
       },
@@ -169,7 +197,12 @@ export default {
 
         const data = await response.json();
         console.log('Данные успешно сохранены:', data);
+        await this.fetchData();
 
+        // Показываем уведомление и закрываем форму
+        this.snackbarText = 'Данные успешно сохранены!';
+        this.snackbar = true;
+        this.showForm = false; // Закрываем форму
         // Дополнительные действия после успешного сохранения:
         // - Очистить форму
         // - Показать сообщение об успехе
@@ -194,5 +227,39 @@ export default {
 </script>
 
 <style scoped>
-/* Добавьте стили для футера, если необходимо */
+.dashed-border {
+  border: 2px dashed #ccc;
+  border-radius: 48px;
+}
+.file-input-width {
+  max-width: 300px; /* Ширина по умолчанию */
+}
+
+@media (max-width: 600px) {
+  .file-input-width {
+    max-width: 100%; /* Полная ширина на экранах до 600px */
+  }
+}
+
+@media (max-width: 480px) {
+  .file-input-width {
+    max-width: 70%; /* 90% ширины на экранах до 480px */
+  }
+}
+.custom-icon-size {
+  font-size: 64px; /* Установите желаемый размер */
+}
+/* Добавляем класс для эффекта размытия */
+.blur-background {
+  filter: blur(10px);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Чтобы диалоговое окно не было размыто, добавляем исключение */
+.blur-background .v-dialog {
+  filter: none;
+  pointer-events: auto;
+  user-select: auto;
+}
 </style>
