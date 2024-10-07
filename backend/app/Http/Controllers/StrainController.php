@@ -337,4 +337,24 @@ class StrainController extends Controller
             'record' => $analyzeRecord
         ], Response::HTTP_OK);
     }
+
+    public function getStrainsWithoutSpacers(Request $request)
+    {
+        // Начинаем запрос
+        $query = Strain::query();
+    
+        // Загрузка связанных данных из analyze_strain
+        $query->doesntHave('analyzeStrains');
+    
+        // Получаем результаты
+        $strains = $query->pluck('name');
+    
+        // Проверяем, есть ли записи
+        if ($strains->isEmpty()) {
+            return $this->errorResponse('Записи не найдены', [], Response::HTTP_NOT_FOUND);
+        }
+    
+        // Возвращаем успешный ответ
+        return $this->successResponse($strains, [], Response::HTTP_OK);
+    }
 }

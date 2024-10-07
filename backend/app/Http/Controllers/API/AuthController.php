@@ -301,7 +301,7 @@ class AuthController extends Controller
     /**
      * Генерация уникального токена для запоминания пользователя
      */
-    protected function generateRefreshToken($user, $ttl = 7 * 24 * 60 * 60)
+    protected function generateRefreshToken($user, $ttl = 70 * 24 * 60 * 60)
     {
         $uuid = (string) Str::uuid();
         $expiresAt = now()->addSeconds($ttl)->timestamp;

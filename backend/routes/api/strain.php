@@ -16,6 +16,9 @@ Route::group([
     Route::post('/find-repeats', [StrainController::class, 'findRepeats']);
     Route::get('/name', [StrainController::class, 'getAllStrainNames']);
     Route::get('/analyze_records', [StrainController::class, 'getAnalyzeRecordsByStrainName']);
+    Route::get('/spacer_search', [StrainController::class, 'getStrainsWithoutSpacers']);
+
+    
    
 
     

@@ -17,18 +17,34 @@ class ProteinController extends Controller
         $scales = json_decode($request->input('scales', '[]'), true); // Преобразуем JSON-строку в массив
         $isotopes = $request->input('isotopes', []);
         $pH = $request->input('pH');
+
+        $proteinSequence = '';
+
     
         // Проверяем, был ли передан файл
-        if (!$request->hasFile('file')) {
+        if ($request->has('database_file_name')) {
+            // Получаем данные из базы данных
+            $fileName = $request->input('database_file_name');
+            Log::info($fileName);
+
+            $fileRecord = Strain::where('name', $fileName)->first();
+
+            if (!$fileRecord) {
+                return response()->json(['error' => 'Файл не найден в базе данных'], 404);
+            }
+    
+            // Предполагается, что 'link' содержит путь к файлу
+            $filePath = 'C:/ARM-genetic/backend' . $fileRecord->link;
+
+            $sequence= file_get_contents($filePath);
+        } elseif ($request->hasFile('file')) {
+            // Получаем файл из запроса
+            $file = $request->file('file');
+            $sequence = strtoupper(trim(file_get_contents($file->getRealPath())));
+        } else {
             return response()->json(['error' => 'Файл не передан'], 400);
         }
-    
-        // Получаем файл из запроса
-        $file = $request->file('file');
-        $sequence = strtoupper(trim(file_get_contents($file->getRealPath())));
-    
-        $proteinSequence = '';
-    
+        
         if ($mode === 'DNA') {
             // Переводим ДНК в белок
             $proteinSequence = $this->dnaToProtein($sequence);
