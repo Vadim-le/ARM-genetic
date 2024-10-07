@@ -8,11 +8,25 @@
 
         </div>
         <div class="button-container" v-if="showButtons">
-          <button @click="login" class="btn">Войти</button>
-          <button @click="register" class="btn">Зарегистрироваться</button>
+          <button @click="login" class="btn">Войти / Зарегистрироваться</button>
         </div>
       </div>
       <ul class="circles">
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
         <li></li>
         <li></li>
         <li></li>

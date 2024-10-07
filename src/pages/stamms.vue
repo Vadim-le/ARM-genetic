@@ -161,7 +161,7 @@ export default {
       file: null,
       snackbar: false, // Состояние snackbar
       snackbarText: '', // Текст snackbar
-      snackbarTimeout: 2000, // Время показа snackbar в миллисекундах
+      snackbarTimeout: 4000, // Время показа snackbar в миллисекундах
       snackbarColor: 'success',
       snackbarIcon: 'mdi-check-circle',
       rules: {
@@ -610,6 +610,38 @@ export default {
         file: this.file,
         type_of_bacteria: 'Стафилококк', // Получаем ID из параметров роута
       };
+
+      if (!this.file){
+        this.snackbarText = 'Необходимо прикрепить файл!';
+        this.snackbarColor = 'warning';
+        this.snackbarIcon ='mdi-alert-circle-outline';
+        this.snackbar = true;
+        return; 
+      }
+
+      if (!this.title){
+        this.snackbarText = 'Введите название штамма!';
+        this.snackbarColor = 'warning';
+        this.snackbarIcon ='mdi-alert-circle-outline';
+        this.snackbar = true;
+        return; 
+      }
+
+      if (!this.location){
+        this.snackbarText = 'Выберите страну выделения штамма!';
+        this.snackbarColor = 'warning';
+        this.snackbarIcon ='mdi-alert-circle-outline';
+        this.snackbar = true;
+        return; 
+      }
+
+      if (!this.year_of_allocation){
+        this.snackbarText = 'Выберите год выделения штамма!';
+        this.snackbarColor = 'warning';
+        this.snackbarIcon ='mdi-alert-circle-outline';
+        this.snackbar = true;
+        return; 
+      }
 
       try {
         // Создаем FormData для отправки файла

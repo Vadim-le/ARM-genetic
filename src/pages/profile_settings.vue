@@ -23,7 +23,7 @@
                 <v-card-text>
                   <v-form v-if="isLogin">
                     <template v-if="tab === 'option-1'">
-                      <v-tabs v-model="tab_inside" color="primary">
+                      <v-tabs v-model="tab_inside" color="primary" class="mb-3">
                         <v-tab prepend-icon="mdi-account-cog" text="Основное" value="main"></v-tab>
                         <v-tab prepend-icon="mdi-shield-lock-outline" text="Образование" value="education"></v-tab>
                         <v-tab prepend-icon="mdi-shield-lock-outline" text="Контакты" value="contacts"></v-tab>

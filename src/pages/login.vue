@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-main class="d-flex align-center justify-center" style="height: 100vh; background-color:rgba(50, 132, 224, 0.6);">
+    <v-main class="d-flex align-center justify-center" style="height: 100vh; background-color:rgba(24,103,192);">
       <v-container>
         <v-row class="d-flex justify-center">
           <v-col cols="12" md="3">

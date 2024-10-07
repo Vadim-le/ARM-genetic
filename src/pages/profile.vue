@@ -1,10 +1,13 @@
 <template>
   <v-app>
-    <v-main class="d-flex justify-center" style="">
+    <v-main class="d-flex justify-center" style="background-color:#1867c0;">
       <v-container>
         <v-row class="d-flex flex-wrap justify-center">
+          <v-btn icon @click="goBack" class="mt-3">
+                  <v-icon>mdi-arrow-left</v-icon>
+                </v-btn>
           <v-col sm="12" md="8" class="ma-2"> <!-- Верхняя карточка -->
-            <v-card>
+            <v-card class="custom-card">
               <v-row align="start">
                 <v-col cols="auto">
                   <v-img
@@ -16,85 +19,25 @@
                   ></v-img>
                 </v-col>
                 <v-col class="d-flex flex-column align-start"> <!-- Изменяем на flex-column для вертикального выравнивания -->
-                  <v-card-title class="ma-2">{{ user_metadata }}</v-card-title>
-                  <v-card-title class="ma-2">{{ user_age }}</v-card-title> <!-- Второй заголовок под первым -->
+                  <v-card-title class="mr-2 ml-2 mt-2">ФИО: {{ user_metadata }}</v-card-title>
+                  <v-card-title class="mr-2 ml-2">Возраст: {{user_age }}</v-card-title> <!-- Второй заголовок под первым -->
+                  <v-card-title class="mr-2 ml-2">Ученая степень: {{academicDegree }}</v-card-title>
+                  <v-card-title class="mr-2 ml-2">Ученая звание: {{academicTitle }}</v-card-title>
                 </v-col>
               </v-row>
-              <v-row align="start">
-              </v-row>
             </v-card>
-            <v-card-actions>
-              <v-btn 
-                :class="{'v-btn--active': showFirstGroup}" 
-                @click="showFirstSet">Показать первую группу</v-btn>
-              <v-btn 
-                :class="{'v-btn--active': showSecondGroup}" 
-                @click="showSecondSet">Показать вторую группу</v-btn>
-            </v-card-actions>
-          </v-col>
-
-          <!-- Карточки первой группы -->
-          <template v-if="showFirstGroup">
-            <v-col sm="6" md="4"> 
-              <v-card>
-                <v-img
-                  src="@/images/login.png" 
-                  height="200" 
-                  width="200" 
-                  contain
-                  class="mb-2"
-                ></v-img>
-                <v-row class="ml-4">
-                  <v-col cols="">
-                    <span>Ученая степень:</span>
-                  </v-col>
-                  <v-col cols="6">
-                    <span>{{ academicDegree }}</span>
-                  </v-col>
-                </v-row>
-
-                <v-row class="ml-4">
-                  <v-col cols="6">
-                    <span>Ученое звание:</span>
-                  </v-col>
-                  <v-col cols="6">
-                    <span>{{ academicTitle }}</span>
-                  </v-col>
-                </v-row>
-              </v-card>
-            </v-col>
-
-            <v-col sm="6" md="4"> 
-              <v-card class="custom-card">
-                <v-card-title>Ссылки на журналы</v-card-title>
-                <v-divider></v-divider>
-                <v-list>
-                  <v-list-item-group>
-                    <v-list-item v-for="(record, index) in bibliografia_records" :key="index">
-                      <v-list-item-content>
-                        <v-list-item-subtitle>Название журнала: {{ record.journal_title }}</v-list-item-subtitle>
-                        <v-list-item-subtitle>Ссылка на журнал: <a :href="record.journal_link" target="_blank">{{ record.journal_link }}</a></v-list-item-subtitle>
-                        <v-divider></v-divider>
-                      </v-list-item-content>
-                    </v-list-item>
-                  </v-list-item-group>
-
-                </v-list>
-              </v-card>
-            </v-col>
-            <v-col sm="12" md="8"> 
-              <v-card class="custom-card">
+              <v-card class="custom-card mt-10">
                 <v-card-title>Образование</v-card-title>
                 <v-divider></v-divider>
                 <v-list>
                   <v-list-item-group>
                     <v-list-item v-for="(record, index) in education_records" :key="index">
                       <v-list-item-content>
-                        <v-list-item-subtitle>Учебное заведение: {{ record.educational_institute }}</v-list-item-subtitle>
-                        <v-list-item-subtitle>Образование: {{ record.educational_level }}</v-list-item-subtitle>
-                        <v-list-item-subtitle>Специальность: {{ record.specialization }}</v-list-item-subtitle>
-                        <v-list-item-subtitle>Квалификация: {{ record.qualification }}</v-list-item-subtitle>
-                        <v-list-item-subtitle>Годы обучения: {{ record.years }}</v-list-item-subtitle>
+                        <v-list-item-subtitle class="text-h6 font-weight-bold mb-3">Учебное заведение: {{ record.educational_institute }}</v-list-item-subtitle>
+                        <v-list-item-subtitle class="text-subtitle-1 font-weight-medium mb-2">Образование: {{ record.educational_level }}</v-list-item-subtitle>
+                        <v-list-item-subtitle class="text-subtitle-1 font-weight-medium mb-2">Специальность: {{ record.specialization }}</v-list-item-subtitle>
+                        <v-list-item-subtitle class="text-subtitle-1 font-weight-medium mb-2">Квалификация: {{ record.qualification }}</v-list-item-subtitle>
+                        <v-list-item-subtitle class="text-subtitle-1 font-weight-medium mb-2">Годы обучения: {{ record.years }}</v-list-item-subtitle>
                         <v-divider></v-divider>
                       </v-list-item-content>
                     </v-list-item>
@@ -103,23 +46,6 @@
                 </v-list>
               </v-card>
             </v-col>
-          </template>
-
-          <!-- Карточки второй группы -->
-          <template v-if="showSecondGroup">
-            <v-col sm="12" md="6">
-              <v-card>
-                <v-img
-                  src="@/images/login.png" 
-                  height="200" 
-                  width="200" 
-                  contain
-                  class="mb-2"
-                ></v-img>
-                <v-card-title>Шестая карточка</v-card-title>
-              </v-card>
-            </v-col>
-          </template>
         </v-row>
       </v-container>
     </v-main>
@@ -130,16 +56,12 @@
 export default {
   data() {
     return {
-      showFirstGroup: false,
-      showSecondGroup: false,
-
       user_metadata: '',
       user_age: '',
       academicDegree: '',
       academicTitle: '',
       // TODO: изменить после связки с сервером
       education_records: [],
-      bibliografia_records: [],
     }
 
   },
@@ -148,6 +70,9 @@ export default {
   await this.fetchData(token); // Вызываем метод fetchData с токеном
 },
 methods: {
+  goBack() {
+    this.$router.go(-1);
+  },
   calculateAge(birthday) {
     const birthDate = new Date(birthday);
     const today = new Date();
@@ -196,27 +121,12 @@ methods: {
       years: `${education.start_year} - ${education.end_year}` // Форматируем годы
     }));
 
-    this.bibliografia_records = data.bibliografia.map(bibliografia => ({
-      journal_title: bibliografia.journal_title || '',
-      journal_link: bibliografia.journal_link || '', // Исправлено здесь
-    }));
-
     console.log('Полученные данные:', data);
   } catch (error) {
     console.error('Ошибка при получении данных:', error);
   }
 },
-// Функция для вычисления возраста
 
-
-    showFirstSet() {
-      this.showFirstGroup = true;
-      this.showSecondGroup = false;
-    },
-    showSecondSet() {
-      this.showFirstGroup = false;
-      this.showSecondGroup = true;
-    },
   },
 };
 </script>
@@ -229,8 +139,8 @@ methods: {
 }
 
 .custom-card {
-  background-color: #FDFFF5;
-  border-radius: 20px;
+  background-color: #ffffff;
+  border-radius: 10px;
   padding: 10px;
 }
 </style>
