@@ -4,9 +4,7 @@
       </div>
       <div class="container">
         <div class="text-container" v-if="showText">
-          <h1 class="fade-in">Добро пожаловать на нашу страницу!</h1>
-          <h1 class="fade-in">Добро пожаловать на нашу страницу!</h1>
-          <h1 class="fade-in">Добро пожаловать на нашу страницу!</h1>
+          <h1 class="fade-in">Добро пожаловать в мир генетических исследований!</h1>
 
         </div>
         <div class="button-container" v-if="showButtons">
@@ -42,7 +40,7 @@
         this.showText = true;
         setTimeout(() => {
           this.showButtons = true;
-        }, 1000); // Задержка перед появлением кнопок
+        }, 540); // Задержка перед появлением кнопок
       }, 500); // Задержка перед появлением текста
     },
     methods: {
@@ -110,27 +108,62 @@
   }
   
   .button-container {
-    margin-top: 20px;
-    opacity: 0;
-    animation: fadeIn 1s ease-in-out forwards;
-    animation-delay: 1s; /* Задержка перед анимацией кнопок */
-  }
-  
-  .btn {
-    margin: 5px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    border: none;
-    border-radius: 5px;
-    background-color: #007bff;
-    color: white;
-    transition: background-color 0.3s;
-  }
-  
-  .btn:hover {
-    background-color: #0056b3;
-  }
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.btn {
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #007bff, #00c6ff);
+  color: white;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 123, 255, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
+  transition: transform 0.3s ease;
+  transform: translateX(-100%);
+}
+
+.btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 8px rgba(0, 123, 255, 0.3);
+}
+
+.btn:hover:before {
+  transform: translateX(100%);
+}
+
+.btn:active {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+}
+
+.btn-login {
+  background: linear-gradient(135deg, #007bff, #00c6ff);
+}
+
+.btn-register {
+  background: linear-gradient(135deg, #ff7e5f, #feb47b);
+}
   
   .circles {
     position: absolute;

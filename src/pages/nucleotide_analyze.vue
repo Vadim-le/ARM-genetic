@@ -2,10 +2,12 @@
   <v-container>
     <v-row justify="center" align="center" class="my-5">
       <v-col cols="12" md="8">
-        <v-card class="pa-5">
-          <v-card-title class="text-h5 text-center">
-            Анализ штаммов
-          </v-card-title>
+        <v-card class="elevation-12 rounded-lg" style="width: 100%;">
+          <v-toolbar color="primary" dark flat>
+              <v-toolbar-title class="text-h4 font-weight-bold">
+                Анализ нуклеотидов
+              </v-toolbar-title>
+            </v-toolbar>
           <v-card-text>
             <v-row>
               <v-col cols="12" sm="6">
@@ -26,6 +28,15 @@
                 </v-btn>
               </v-col>
             </v-row>
+            <v-alert
+        v-if="!selectedStrain"
+        type="info"
+        class="custom-alert"
+        outlined
+        dense
+      >
+        <strong>Примечание:</strong> Сначала выберите штамм, чтобы активировать кнопку анализа.
+      </v-alert>
           </v-card-text>
         </v-card>
       </v-col>
@@ -38,23 +49,23 @@
             v-for="(record, index) in analyzeStrains"
             :key="record.id"
           >
-            <v-card class="mx-auto" max-width="1180">
+            <v-card class="mx-auto elevation-8 rounded-lg" max-width="1180">
               <v-card-title class="text-h6">
                 Запись {{ index + 1 }}
               </v-card-title>
-              <v-card-text>
-                <p><strong>Известен:</strong> {{ record.is_known ? 'Да' : 'Нет' }}</p>
-                <p><strong>Повторяющаяся последовательность:</strong> {{ record.repeat_sequence }}</p>
-                <p><strong>Позиции повторов:</strong> {{ record.repeat_positions }}</p>
-                <p><strong>Спейсер:</strong> {{ record.spacer_sequence }}</p>
-                <p><strong>Позиции спейсера:</strong> {{ record.spacer_positions }}</p>
-                <p><strong>Статус:</strong> {{ record.status }}</p>
-                <p><strong>Полный контекст:</strong></p>
-                <span v-html="highlightText(record.full_context, [record.repeat_sequence, record.spacer_sequence])"></span>
-                <v-alert type="info" class="custom-alert" outlined>
-  <strong>Примечание:</strong> Желтым цветом выделены повторяющиеся последовательности, а голубым цветом выделены спейсеры.
-</v-alert>
-              </v-card-text>
+              <v-card-text class="record-text">
+  <p><strong>Известен:</strong> {{ record.is_known ? 'Да' : 'Нет' }}</p>
+  <p><strong>Повторяющаяся последовательность:</strong> {{ record.repeat_sequence }}</p>
+  <p><strong>Позиции повторов:</strong> {{ record.repeat_positions }}</p>
+  <p><strong>Спейсер:</strong> {{ record.spacer_sequence }}</p>
+  <p><strong>Позиции спейсера:</strong> {{ record.spacer_positions }}</p>
+  <p><strong>Статус:</strong> {{ record.status }}</p>
+  <p><strong>Полный контекст:</strong></p>
+  <span v-html="highlightText(record.full_context, [record.repeat_sequence, record.spacer_sequence])"></span>
+  <v-alert type="info" class="custom-alert" outlined>
+    <strong>Примечание:</strong> Желтым цветом выделены повторяющиеся последовательности, а голубым цветом выделены спейсеры.
+  </v-alert>
+</v-card-text>
               <v-card-actions class="d-flex justify-center">
                 <v-btn color="success" @click="updateStatus(record.id, 'approved')" outlined>
                   Одобрено
@@ -77,8 +88,18 @@ export default {
     return {
       strains: [], // Список штаммов
       selectedStrain: null, // Выбранный штамм
-      analyzeStrains: [] // Список записей анализа
+      analyzeStrains: [],// Список записей анализа
+      strainName: '',
     };
+  },
+  mounted() {
+  if (this.$route.params.strainName) {
+    this.selectedStrain = this.$refs.strainName;
+    this.fetchAnalyzeStrains();
+  }
+},
+props: {
+    strainName: String,
   },
   created() {
     this.fetchStrains();
@@ -178,5 +199,24 @@ export default {
 .custom-alert {
   background-color: rgba(0, 255, 255, 0.055) !important;
   color: #1bb40d !important;
+}
+
+.record-text {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.record-text p {
+  margin-bottom: 10px;
+}
+
+.record-text span {
+  font-size: 14px;
+  color: #666;
+}
+
+.custom-alert {
+  font-size: 14px;
+  margin-top: 10px;
 }
 </style>

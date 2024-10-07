@@ -8,6 +8,7 @@ import Profile from '@/pages/profile.vue';
 import SequenceManagement from '@/pages/sequence_management.vue';
 import ProteinAnalyze from '@/pages/protein_analyze.vue';
 import NucleotideAnalyze from '@/pages/nucleotide_analyze.vue';
+import FindRepeats from '@/pages/find_repeats.vue';
 
 
 
@@ -58,6 +59,11 @@ const routes = [
         path: '/nucleotide_analyze',
         name: 'NucleotideAnalyze',
         component: NucleotideAnalyze // Указываем компонент для страницы входа
+    },
+    {
+        path: '/find_repeats',
+        name: 'FindRepeats',
+        component: FindRepeats // Указываем компонент для страницы входа
     },
     // Другие маршруты
 ];
