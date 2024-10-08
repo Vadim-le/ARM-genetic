@@ -92,127 +92,110 @@
 </template>
 
 <script>
-import { jwtDecode } from "jwt-decode";
+	import {
+		jwtDecode
+	}
+	from "jwt-decode";
+	export default {
+		data() {
+				return {
+					repeatvisible: false,
+					visible: false,
+					isLogin: true,
+					login_email: '',
+					login_password: '',
+					newName: '',
+					newSurname: '',
+					newEmail: '',
+					newPassword: '',
+					errorMessage: '',
+					rules: {
+						required: value => !!value || 'Required.',
+						min: v => v.length >= 8 || 'Min 8 characters',
+					},
+				};
+			},
+			methods: {
+				toggleForm() {
+					this.isLogin = !this.isLogin;
+				},
+				async login() {
+					try {
+						const loginData = {
+							email: this.login_email,
+							password: this.login_password,
+						};
+						const response = await fetch('http://localhost:8000/api/auth/login', {
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json',
+							},
+							body: JSON.stringify(loginData),
+						});
+						if (!response.ok) {
+							throw new Error('Login failed');
+						}
+						const data = await response.json();
 
-export default {
-  data() {
-    return {
-      repeatvisible: false,
-      visible: false,
-      isLogin: true,
-      //Поля для авторизации уже зарегестрированного юзера
-      login_email: '',
-      login_password: '',
-      //Поля для регистрации нового юзера
-      newName: '',
-      newSurname: '',
-      newEmail: '',
-      newPassword: '',
+            const decodedToken = jwtDecode(data.access_token);
+						console.log('Decoded token:', decodedToken);
 
-      errorMessage: '', //сообщение об ошибке
+            const userRoles = decodedToken.roles; 
+						console.log('User roles:', userRoles);
+						const userId = decodedToken.sub;
+						console.log('User ID:', userId);
 
-      rules: {
-        required: value => !!value || 'Required.',
-        min: v => v.length >= 8 || 'Min 8 characters',
-      },
-    };
-  },
+            localStorage.setItem('token', data.access_token);
+						this.$store.commit('setUserRole', userRoles);
+						this.$store.commit('setUserId', userId);
+						this.$router.push({
+							name: 'Main'
+						});
+					} catch (error) {
+						console.error('Error during login:', error);
+					}
+				},
+				async register() {
+					this.errorMessage = '';
+					try {
+						const registrationData = {
+							email: this.newEmail,
+							password: this.newPassword,
+						};
+						console.log("Register data:", registrationData);
+						const response = await fetch('http://localhost:8000/api/auth/register', {
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json',
+							},
+							body: JSON.stringify(registrationData),
+						});
+						const data = await response.json();
+						console.log('Data:', data);
+						if (response.status === 422 && data.error === 'Validation Error') {
+							this.errorMessage = data.messages.email[0]; 
+							return; 
+						}
 
-  methods: {
-    toggleForm() {
-      this.isLogin = !this.isLogin;
-    },    
-    async login() {
-      try {
-        const loginData = {
-          email: this.login_email,
-          password: this.login_password,
-        };
+            const decodedToken = jwtDecode(data.access_token);
+						console.log('Decoded token:', decodedToken);
 
-        const response = await fetch('http://localhost:8000/api/auth/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(loginData),
-        });
+            const userRoles = decodedToken.roles;
+						console.log('User roles:', userRoles);
 
-        if (!response.ok) {
-          throw new Error('Login failed');
-        }
-
-        const data = await response.json();
-
-        // Декодируем токен
-        const decodedToken = jwtDecode(data.access_token);
-        console.log('Decoded token:', decodedToken);
-
-        // Извлекаем роль
-        const userRoles = decodedToken.roles; // Предполагается, что роли находятся в поле "roles"
-        console.log('User roles:', userRoles);
-        const userId = decodedToken.sub;
-        console.log('User ID:', userId);
-
-        // Сохраните токен и роли в состоянии приложения
-        localStorage.setItem('token', data.access_token);
-        this.$store.commit('setUserRole', userRoles);
-        this.$store.commit('setUserId', userId);
-
-        this.$router.push({ name: 'Main' });
-
-      } catch (error) {
-        console.error('Error during login:', error);
-        }
-    },
-    async register() {
-      this.errorMessage = '';
-      try {
-        const registrationData = {
-          email: this.newEmail,
-          password: this.newPassword,
-        };
-
-        console.log("Register data:", registrationData);
-
-        const response = await fetch('http://localhost:8000/api/auth/register', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(registrationData),
-        });
-
-        const data = await response.json();
-        console.log('Data:', data);
-
-        // Проверка на ошибки валидации
-        if (response.status === 422 && data.error === 'Validation Error') {
-          this.errorMessage = data.messages.email[0]; // Установите сообщение об ошибке
-          return; // Завершите функцию в случае ошибки
-        }
-
-        // Декодируем токен
-        const decodedToken = jwtDecode(data.access_token);
-        console.log('Decoded token:', decodedToken);
-
-        // Извлекаем роль
-        const userRoles = decodedToken.roles;
-        console.log('User roles:', userRoles);
-
-        // Сохраните токен и роли в состоянии приложения
-        localStorage.setItem('token', data.access_token);
-        this.$store.commit('setUserRole', userRoles);
-
-        this.$router.push({ name: 'Main' });
-
-        console.log('Registration successful:', data);
-      } catch (error) {
-        console.error('Error during registration:', error);
-        this.errorMessage = 'Произошла непредвиденная ошибка. Пожалуйста, попробуйте снова.'; // Общее сообщение об ошибке
-      }
-    }
-  },
-};
+						localStorage.setItem('token', data.access_token);
+						this.$store.commit('setUserRole', userRoles);
+						this.$router.push({
+							name: 'Main'
+						});
+						console.log('Registration successful:', data);
+					} catch (error) {
+						console.error('Error during registration:', error);
+						this.errorMessage = 'Произошла непредвиденная ошибка. Пожалуйста, попробуйте снова.'; // Общее сообщение об ошибке
+					}
+				}
+			},
+	};
 </script>
 
 <style scoped>
@@ -224,17 +207,17 @@ export default {
 }
 
 .custom-button {
-  background-color: #3284e0; /* Зеленый фон */
-  color: #FDFFF5; /* Белый текст */
-  border-radius: 20px; /* Закругленные углы */
-  padding: 18px 20px; /* Отступы */
-  font-size: 16px; /* Размер шрифта */
-  transition: background-color 0.3s; /* Плавный переход */
+  background-color: #3284e0; 
+  color: #FDFFF5; 
+  border-radius: 20px;
+  padding: 18px 20px;
+  font-size: 16px; 
+  transition: background-color 0.3s;
   border: 2px solid #3284e0;
 }
 
 .custom-button:hover {
-  background-color: #FDFFF5; /* Цвет при наведении */
+  background-color: #FDFFF5;
   color: #3284e0;
   border-color: #3284e0;
 }

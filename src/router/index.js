@@ -18,54 +18,53 @@ const routes = [
     {
         path: '/',
         name: 'Home',
-        redirect: '/start' // Перенаправление на страницу start
+        redirect: '/start'
     },
     {
         path: '/start',
         name: 'Start',
-        component: Start // Указываем компонент для стартовой страницы
+        component: Start
     },
     {
         path: '/login',
         name: 'Login',
-        component: Login // Указываем компонент для страницы входа
+        component: Login
     },
     {
         path: '/main',
         name: 'Main',
-        component: Main // Указываем компонент для страницы входа
+        component: Main
     },
     {
         path: '/profile_settings',
         name: 'ProfileSettings',
-        component: ProfileSettings // Указываем компонент для страницы входа
+        component: ProfileSettings
     },
     {
         path: '/profile',
         name: 'Profile',
-        component: Profile // Указываем компонент для страницы входа
+        component: Profile
     },
     {
         path: '/sequence_management/:id',
         name: 'SequenceManagement',
-        component: SequenceManagement // Указываем компонент для страницы входа
+        component: SequenceManagement
     },
     {
         path: '/protein_analyze',
         name: 'ProteinAnalyze',
-        component: ProteinAnalyze // Указываем компонент для страницы входа
+        component: ProteinAnalyze
     },
     {
         path: '/nucleotide_analyze',
         name: 'NucleotideAnalyze',
-        component: NucleotideAnalyze // Указываем компонент для страницы входа
+        component: NucleotideAnalyze
     },
     {
         path: '/find_repeats',
         name: 'FindRepeats',
-        component: FindRepeats // Указываем компонент для страницы входа
+        component: FindRepeats
     },
-    // Другие маршруты
 ];
 
 const router = createRouter({

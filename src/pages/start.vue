@@ -1,49 +1,49 @@
 <template>
-    <div class="area">
-      <div class="context">
-      </div>
-      <div class="container">
-        <div class="text-container" v-if="showText">
-          <h1 class="fade-in">Добро пожаловать в мир генетических исследований!</h1>
+	<div class="area">
+		<div class="context">
+		</div>
+		<div class="container">
+			<div class="text-container" v-if="showText">
+				<h1 class="fade-in">Добро пожаловать в мир генетических исследований!</h1>
 
-        </div>
-        <div class="button-container" v-if="showButtons">
-          <button @click="login" class="btn">Войти / Зарегистрироваться</button>
-        </div>
-      </div>
-      <ul class="circles">
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-      </ul>
-    </div>
-  </template>
+			</div>
+			<div class="button-container" v-if="showButtons">
+				<button @click="login" class="btn">Войти / Зарегистрироваться</button>
+			</div>
+		</div>
+		<ul class="circles">
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+		</ul>
+	</div>
+</template>
   
-  <script>
-  export default {
-    data() {
+<script>
+export default {
+  data() {
       return {
         showText: false,
         showButtons: false,
@@ -54,19 +54,23 @@
         this.showText = true;
         setTimeout(() => {
           this.showButtons = true;
-        }, 540); // Задержка перед появлением кнопок
-      }, 500); // Задержка перед появлением текста
+        }, 540); 
+      }, 500);
     },
     methods: {
-        login() {
-            this.$router.push({ name: 'Login' });
-        },
+      login() {
+        this.$router.push({
+          name: 'Login'
+        });
+      },
       register() {
-        this.$router.push({ name: 'Test' });
+        this.$router.push({
+          name: 'Test'
+        });
       },
     },
-  };
-  </script>
+};
+</script>
   
   <style scoped>
   @import url('https://fonts.googleapis.com/css?family=Exo:400,700');
@@ -108,7 +112,7 @@
     justify-content: center;
     height: 100vh;
     position: relative;
-    z-index: 1; /* Чтобы текст и кнопки были выше фона */
+    z-index: 1; 
   }
   
   .text-container {
@@ -117,7 +121,7 @@
   }
   
   .fade-in {
-    color: #ffffff; /* Замените на нужный вам цвет */
+    color: #ffffff;
     animation: fadeIn 1s ease-in-out;
   }
   
