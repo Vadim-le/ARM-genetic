@@ -6,14 +6,7 @@ use App\Http\Controllers\Auth\VKAuthController;
 
 require_once __DIR__ . '/api/admin.php';
 require_once __DIR__ . '/api/auth.php';
-require_once __DIR__ . '/api/blogs.php';
-require_once __DIR__ . '/api/comments.php';
-require_once __DIR__ . '/api/events.php';
-require_once __DIR__ . '/api/news.php';
-require_once __DIR__ . '/api/organizations.php';
 require_once __DIR__ . '/api/permissions.php';
-require_once __DIR__ . '/api/podcasts.php';
-require_once __DIR__ . '/api/projects.php';
 require_once __DIR__ . '/api/roles.php';
 require_once __DIR__ . '/api/users.php';
 require_once __DIR__ . '/api/strain.php';
