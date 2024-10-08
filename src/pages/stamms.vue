@@ -217,8 +217,17 @@
 						this.snackbar = true;
 						this.showForm = false;
 					} catch (error) {
-						console.error('Ошибка при сохранении данных:', error);
-					}
+						console.log('Error:', error);
+
+						if (error instanceof Error && error.message.includes('Unprocessable Content')) {
+							this.snackbarText = 'Имя уже занято!';
+							this.snackbarColor = 'error';
+							this.snackbarIcon = 'mdi-alert-circle-outline';
+							this.snackbar = true;
+						} else {
+							console.error('Ошибка при сохранении данных:', error);
+						}
+						}
 				},
 				generateYears() {
 					const currentYear = new Date().getFullYear();
