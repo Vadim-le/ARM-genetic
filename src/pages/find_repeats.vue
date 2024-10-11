@@ -39,6 +39,11 @@
 						<p>Найдено повторов: {{ numRepeats }}</p>
 						<p>Найдено спейсеров: {{ numSpacers }}</p>
 					</v-card-text>
+					<v-card-title>Спэйсеры и повторяющиеся последовательности</v-card-title>
+						<v-card-text>
+							<v-data-table :headers="headers" :items="analyzeStrains" :items-per-page="5" class="elevation-1" dense>
+							</v-data-table>
+						</v-card-text>
 					<v-alert type="info" class="custom-alert" outlined>
 						<strong>Примечание:</strong> Для дальнейшего анализа и работы с полученными результатами, пожалуйста, воспользуйтесь нашим инструментом <strong>"Анализ нуклеотидов"</strong> в разделе <strong>"Инструменты анализа"</strong>!
 					</v-alert>
@@ -54,6 +59,27 @@
 				return {
 					strains: [], // Список штаммов
 					selectedStrain: null, // Выбранный штамм
+					headers: [{
+						title: 'Повторяющиеся последовательности',
+						key: 'repeat',
+						align: 'start',
+						sortable: false
+					}, {
+						title: 'Индексы повторяющихся последовательностей',
+						key: 'repeat_positions',
+						align: 'end',
+						sortable: false
+					}, {
+						title: 'Спэйсеры',
+						key: 'spacer',
+						align: 'end',
+						sortable: false
+					}, {
+						title: 'Индексы спэйсеров',
+						key: 'spacer_positions',
+						align: 'end',
+						sortable: false
+					}, ],
 					numRepeats: 0,
 					numSpacers: 0,
 					loading: false,
@@ -63,7 +89,6 @@
 				this.fetchStrains();
 			},
 			methods: {
-				// Получаем список штаммов
 				async fetchStrains() {
 					const token = localStorage.getItem('token');
 					try {
@@ -71,7 +96,7 @@
 							method: 'GET',
 							headers: {
 								'Content-Type': 'application/json',
-								'Authorization': `Bearer ${token}`, // Добавляем токен в заголовок
+								'Authorization': `Bearer ${token}`, 
 							},
 						});
 						if (!response.ok) {
@@ -79,9 +104,8 @@
 						}
 						const data = await response.json();
 						console.log(data);
-						// Извлекаем имена штаммов из ключа 'data'
 						if (Array.isArray(data.data)) {
-							this.strains = data.data; // Убедитесь, что это массив объектов с id и name
+							this.strains = data.data;
 						} else {
 							console.error('Ожидается массив, но получен другой тип данных:', data.data);
 						}
@@ -89,7 +113,7 @@
 						console.error('Ошибка при получении штаммов:', error);
 					}
 				},
-				// Получаем записи анализа для выбранного штамма
+
 				async fetchAnalyzeStrains() {
 					this.loading = true;
 					const token = localStorage.getItem('token');
@@ -121,7 +145,7 @@
 						this.numRepeats = 0;
 						this.numSpacers = 0;
 					} finally {
-						this.loading = false; // Set the loading flag to false
+						this.loading = false; 
 					}
 				},
 			},
