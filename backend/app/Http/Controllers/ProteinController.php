@@ -33,7 +33,6 @@ class ProteinController extends Controller
                 return response()->json(['error' => 'Файл не найден в базе данных'], 404);
             }
     
-            // Предполагается, что 'link' содержит путь к файлу
             $filePath = 'C:/ARM-genetic/backend' . $fileRecord->link;
 
             $sequence= file_get_contents($filePath);
