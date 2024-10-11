@@ -1,7 +1,7 @@
 <template>
 	<v-container>
 		<v-row justify="center" align="center" class="my-5">
-			<v-col cols="12" md="8">
+			<v-col cols="12" md="9">
 				<v-card class="elevation-12 rounded-lg" style="width: 100%;">
 					<v-toolbar color="primary" dark flat>
 						<v-toolbar-title class="text-h4 font-weight-bold">
@@ -27,12 +27,10 @@
 			</v-col>
 		</v-row>
 		<v-row justify="center" align="center" class="my-5">
-			<v-col cols="12" md="8" class="d-flex justify-center align-center">
-				<!-- Add a loading animation component -->
+			<v-col cols="12" md="9" class="d-flex justify-center align-center">
 				<div v-if="loading">
 					<v-progress-circular indeterminate color="primary" size="100"></v-progress-circular>
 				</div>
-				<!-- Conditionally render the results card -->
 				<v-card v-else-if="numRepeats !== 0 && numSpacers !== 0" class="elevation-12 rounded-lg" style="width: 80vw">
 					<v-card-title class="text-h6"> Результаты поиска </v-card-title>
 					<v-card-text>
